@@ -307,7 +307,7 @@ async function doSearch(){
 
       data = await res.json();
 
-      if(data.error || !data.content){
+      if(data.error){
         throw new Error("Claude sin credito");
       }
 
