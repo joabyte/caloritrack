@@ -272,10 +272,115 @@ function setTab(tab){["hoy","semana"].forEach(t=>{document.getElementById("view-
 function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
 function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
 async function doSearch(){
-  const input=document.getElementById("searchInput");
-  const q=input.value.trim();if(!q)return;
-  const btn=document.getElementById("searchBtn");
-  btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span>';setError("");
+
+  const input = document.getElementById("searchInput");
+  const q = input.value.trim();
+  if(!q) return;
+
+  const btn = document.getElementById("searchBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⟳</span>';
+  setError("");
+
+  try{
+
+    let data = null;
+
+    // INTENTA CLAUDE PRIMERO
+    try{
+
+      const res = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key": API_KEY,
+          "anthropic-version":"2023-06-01",
+          "anthropic-dangerous-direct-browser-access":"true"
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 400,
+          system: SYSTEM_PROMPT,
+          messages:[{role:"user",content:q}]
+        })
+      });
+
+      data = await res.json();
+
+      if(data.error){
+        throw new Error("Claude sin credito");
+      }
+
+    }catch(e){
+
+      console.log("Claude fallo → usando OpenRouter");
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer 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"
+        },
+        body: JSON.stringify({
+          model:"mistralai/mistral-7b-instruct:free",
+          messages:[
+            {role:"system",content:SYSTEM_PROMPT},
+            {role:"user",content:q}
+          ]
+        })
+      });
+
+      const or = await res.json();
+
+      data = {
+        content:[{text: or.choices[0].message.content}]
+      };
+
+    }
+
+    const text = data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+    const match = text?.match(/\{[\s\S]*\}/);
+
+    if(!match){
+      setError("Respuesta invalida");
+      btn.disabled=false;
+      btn.innerHTML="↑";
+      return;
+    }
+
+    const parsed = JSON.parse(match[0]);
+
+    if(parsed.error){
+      setError("No reconoci ese alimento 🌿");
+      btn.disabled=false;
+      btn.innerHTML="↑";
+      return;
+    }
+
+    const food={
+      id:Date.now(),
+      name:parsed.name||q,
+      emoji:parsed.emoji||"🍽️",
+      calories:Number(parsed.calories)||0,
+      protein:Number(parsed.protein)||0,
+      carbs:Number(parsed.carbs)||0,
+      fat:Number(parsed.fat)||0,
+      fiber:Number(parsed.fiber)||0,
+      portion:parsed.portion||"1 porcion"
+    };
+
+    persistMeals({...meals,[activeMeal]:[food,...meals[activeMeal]]});
+
+    input.value="";
+    input.focus();
+
+  }catch(e){
+    setError("Error: "+e.message);
+  }
+
+  btn.disabled=false;
+  btn.innerHTML="↑";
+}
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:400,system:SYSTEM_PROMPT,messages:[{role:"user",content:q}]})});
     const data=await res.json();
