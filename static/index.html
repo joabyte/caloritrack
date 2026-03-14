@@ -610,12 +610,14 @@ function render(){
 function setMeal(key){activeMeal=key;render();}
 function setMealFoto(key){activeMealFoto=key;render();}
 function setTab(tab){
-    ["hoy","foto","semana"].forEach(t=>{
-        document.getElementById("view-"+t).style.display=t===tab?"block":"none";
-        document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
+    ["hoy","foto","semana","nutri"].forEach(t=>{
+        var el=document.getElementById("view-"+t);
+        if(el) el.style.display=t===tab?"block":"none";
+        var tb=document.getElementById("tab-"+t);
+        if(tb) tb.className="tab-btn"+(t===tab?" active":"");
     });
-    // camara se abre con boton
     if(tab==="semana")renderWeek();
+    if(tab==="nutri")initChat();
 }
 function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
 function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
