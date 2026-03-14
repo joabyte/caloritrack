@@ -93,6 +93,8 @@
         #flashOverlay.show { opacity: 0.8; }
         #noCamMsg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: #8aaa7a; background: #f0f8ee; padding: 20px; text-align: center; }
         #btnActivarCam { padding: 12px 24px; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        #fotoCapturada { width: 100%; border-radius: 16px; margin-bottom: 12px; display: none; }
+        .btn-nueva-foto { width: 100%; padding: 11px; border-radius: 12px; border: 1.5px solid #3da050; background: #f2faf0; color: #3a7a3a; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
         .foto-resultado { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; display: none; animation: fadeSlide 0.3s ease; }
         .foto-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #d8eed4; font-size: 12px; color: #3a5a3a; }
         .foto-item:last-child { border-bottom: none; }
@@ -294,49 +296,66 @@ function todayKey(){return new Date().toISOString().split("T")[0];}
 function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-async function activarCamara(){
-    const errEl=document.getElementById("camError");
-    errEl.style.display="none";
-    document.getElementById("btnActivarCam").textContent="Iniciando...";
+async function abrirCamara(){
+    document.getElementById("btnAbrirCam").style.display="none";
+    document.getElementById("fotoCapturada").style.display="none";
+    document.getElementById("btnNuevaFoto").style.display="none";
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("fotoError").style.display="none";
+    const container=document.getElementById("camContainer");
+    container.style.display="block";
     try{
         if(camStream) camStream.getTracks().forEach(t=>t.stop());
         camStream=await navigator.mediaDevices.getUserMedia({
             video:{facingMode:{ideal:facingMode},width:{ideal:1280},height:{ideal:720}},audio:false
         });
-        const video=document.getElementById("camVideo");
-        video.srcObject=camStream;
-        video.style.display="block";
-        document.getElementById("noCamMsg").style.display="none";
-        document.getElementById("camOverlayBar").style.display="flex";
-        document.getElementById("camShutterRow").style.display="flex";
+        document.getElementById("camVideo").srcObject=camStream;
     }catch(e){
-        document.getElementById("btnActivarCam").textContent="REINTENTAR";
-        errEl.textContent="No se pudo acceder: "+(e.message||"Permiso denegado");
-        errEl.style.display="block";
+        container.style.display="none";
+        document.getElementById("btnAbrirCam").style.display="flex";
+        alert("No se pudo acceder a la camara: "+(e.message||"Permiso denegado"));
     }
+}
+
+function nuevaFoto(){
+    document.getElementById("fotoCapturada").style.display="none";
+    document.getElementById("btnNuevaFoto").style.display="none";
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("fotoError").style.display="none";
+    abrirCamara();
 }
 
 function flipCamara(){
     facingMode=facingMode==="environment"?"user":"environment";
-    activarCamara();
+    abrirCamara();
 }
 
 async function capturarYAnalizar(){
     const video=document.getElementById("camVideo");
     const canvas=document.getElementById("camCanvas");
     if(!camStream||!video.videoWidth) return;
+    // Flash
     const flash=document.getElementById("flashOverlay");
     flash.classList.add("show");
     setTimeout(()=>flash.classList.remove("show"),180);
+    // Capturar frame
     canvas.width=video.videoWidth;
     canvas.height=video.videoHeight;
     canvas.getContext("2d").drawImage(video,0,0);
-    const base64=canvas.toDataURL("image/jpeg",0.85).split(",")[1];
+    const dataURL=canvas.toDataURL("image/jpeg",0.85);
+    const base64=dataURL.split(",")[1];
+    // Apagar camara y mostrar foto
+    if(camStream) camStream.getTracks().forEach(t=>t.stop());
+    camStream=null;
+    document.getElementById("camContainer").style.display="none";
+    const fotoEl=document.getElementById("fotoCapturada");
+    fotoEl.src=dataURL;
+    fotoEl.style.display="block";
+    document.getElementById("btnNuevaFoto").style.display="block";
     document.getElementById("fotoLoading").style.display="block";
     document.getElementById("fotoResultado").style.display="none";
     document.getElementById("fotoError").style.display="none";
     document.getElementById("btnShutter").disabled=true;
-    document.getElementById("camBadge").textContent="ANALIZANDO...";
     try{
         const res=await fetch("https://api.anthropic.com/v1/messages",{
             method:"POST",
@@ -374,7 +393,6 @@ async function capturarYAnalizar(){
         document.getElementById("fotoError").style.display="block";
     }
     document.getElementById("btnShutter").disabled=false;
-    document.getElementById("camBadge").textContent="EN VIVO";
 }
 
 function agregarFotoAlDia(){
@@ -442,7 +460,7 @@ function setTab(tab){
         document.getElementById("view-"+t).style.display=t===tab?"block":"none";
         document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
     });
-    if(tab==="foto"&&!camStream)activarCamara();
+    // camara se abre manualmente
     if(tab==="semana")renderWeek();
 }
 function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
