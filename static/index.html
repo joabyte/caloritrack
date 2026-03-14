@@ -570,38 +570,5 @@ function renderWeek(){
 }
 render();
 </script>
-
-<style>
-    :root { --primary-color: #4CAF50; }
-    /* Forzamos el color en el header y botones usando la variable */
-    header, .header, .top-bar, button, .btn { background-color: var(--primary-color) !important; }
-    .text-primary, i { color: var(--primary-color); }
-</style>
-<script>
-const themes = {
-    'Default': '#4CAF50', 'Blue': '#2196F3', 'Red': '#F44336', 'Pink': '#E91E63',
-    'Purple': '#9C27B0', 'Indigo': '#3F51B5', 'Teal': '#009688', 'Green': '#43A047',
-    'Yellow': '#FFEB3B', 'Orange': '#FF9800', 'Brown': '#795548', 'Grey': '#9E9E9E', 'Black': '#212121'
-};
-function applyTheme(themeName) {
-    const color = themes[themeName];
-    if (color) {
-        document.documentElement.style.setProperty('--primary-color', color);
-        localStorage.setItem('userTheme', themeName);
-        console.log("Color aplicado:", color);
-    }
-}
-document.addEventListener('DOMContentLoaded', () => {
-    // Buscar los radio buttons por nombre 'theme'
-    document.querySelectorAll('input[name="theme"]').forEach(radio => {
-        radio.addEventListener('change', (e) => applyTheme(e.target.value));
-    });
-    // Cargar preferencia guardada
-    const savedTheme = localStorage.getItem('userTheme') || 'Default';
-    applyTheme(savedTheme);
-    const radio = document.querySelector(`input[value="${savedTheme}"]`);
-    if (radio) radio.checked = true;
-});
-</script>
 </body>
 </html>
