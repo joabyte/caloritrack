@@ -1,121 +1,720 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>CaloriTrack</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#f4f6fb;
-text-align:center;
-padding:20px;
-}
-
-button{
-padding:14px;
-margin:10px;
-border-radius:12px;
-border:none;
-background:#4CAF50;
-color:white;
-font-size:16px;
-width:200px;
-}
-
-img{
-max-width:90%;
-margin-top:20px;
-border-radius:10px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#eaf5e6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="CaloriTrack">
+    <link rel="manifest" href="/manifest.json">
+    <title>CaloriTrack</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(160deg, #eaf5e6, #f4fbf0, #e8f5e2); min-height: 100vh; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #b8d8b0; border-radius: 99px; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+        .wrap { max-width: 430px; margin: 0 auto; padding-bottom: 60px; }
+        .header { padding: 28px 20px 20px; background: linear-gradient(180deg, #dff2d8, transparent); border-bottom: 1px solid #d4eed0; }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .header-title { font-family: 'Fraunces', serif; font-size: 24px; color: #1a3a1a; font-weight: 700; }
+        .header-sub { font-size: 12px; color: #7aaa7a; margin-top: 4px; text-transform: capitalize; }
+        .header-label { font-size: 11px; letter-spacing: 3px; color: #5a9a5a; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .btn-header { background: white; border: 1px solid #d0e8cc; border-radius: 12px; padding: 7px 11px; font-size: 11px; color: #4a7a4a; cursor: pointer; font-weight: 600; }
+        .btn-header.active { background: linear-gradient(135deg, #5fc96e, #3da050); border-color: #3da050; color: white; }
+        .card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 3px 18px rgba(50,100,50,.07); margin-bottom: 14px; }
+        .card-title { font-size: 11px; color: #7aaa7a; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .ring-wrap { background: white; border-radius: 24px; padding: 18px 20px; box-shadow: 0 6px 30px rgba(50,100,50,.09); display: flex; align-items: center; gap: 18px; }
+        .macro-row { display: flex; justify-content: space-between; font-size: 11px; color: #6b876b; margin-bottom: 3px; }
+        .macro-bg { height: 6px; border-radius: 99px; background: #e4f0e0; margin-bottom: 8px; }
+        .macro-fill { height: 100%; border-radius: 99px; transition: width 0.7s; }
+        .remaining { padding: 7px 12px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+        .tabs { display: flex; gap: 6px; background: white; border-radius: 14px; padding: 4px; box-shadow: 0 2px 10px rgba(50,100,50,.06); margin-bottom: 14px; }
+        .tab-btn { flex: 1; padding: 9px; border-radius: 10px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: transparent; color: #7aaa7a; }
+        .tab-btn.active { background: linear-gradient(135deg, #5fc96e, #3da050); color: white; }
+        .meal-btns { display: flex; gap: 6px; margin-bottom: 12px; }
+        .meal-btn { flex: 1; padding: 7px 2px; border-radius: 10px; border: 1.5px solid #dceeda; font-size: 11px; font-weight: 700; cursor: pointer; background: #f8fcf6; color: #6b876b; text-align: center; }
+        .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-input { flex: 1; border: 1.5px solid #dceeda; border-radius: 14px; padding: 11px 14px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; }
+        .search-input:focus { border-color: #6abf7a; }
+        .search-btn { width: 46px; height: 46px; border-radius: 14px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .search-btn:disabled { background: #c8e4c4; cursor: default; }
+        .quick-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+        .quick-btn { background: #f2faf0; border: 1px solid #d0e8cc; border-radius: 99px; padding: 5px 11px; font-size: 12px; color: #4a7a4a; cursor: pointer; font-weight: 500; }
+        .error-box { font-size: 12px; color: #c06050; background: #fff5f3; border: 1px solid #f0d0c8; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; }
+        .food-card { display: flex; align-items: center; padding: 10px 12px; margin-bottom: 6px; border-radius: 14px; background: #f5fcf3; border: 1px solid #d8eed4; animation: fadeSlide 0.3s ease; }
+        .food-emoji { font-size: 22px; flex-shrink: 0; margin-right: 10px; }
+        .food-name { font-weight: 600; color: #1e3a1e; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .food-portion { font-size: 10px; color: #8aaa7a; }
+        .food-macro { text-align: center; margin-right: 8px; }
+        .food-macro-val { font-size: 10px; font-weight: 700; }
+        .food-macro-lbl { font-size: 9px; color: #a0baa0; }
+        .food-cal { font-size: 15px; color: #3a7a3a; font-weight: 700; font-family: 'Fraunces', serif; }
+        .food-cal-lbl { font-size: 9px; color: #9ab89a; }
+        .remove-btn { background: none; border: none; cursor: pointer; color: #c8b0b0; font-size: 13px; padding: 2px 3px; margin-left: 4px; }
+        .empty-state { text-align: center; padding: 32px 20px; color: #b0c8a8; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(20,40,20,.45); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+        .modal-box { background: white; border-radius: 28px 28px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-family: 'Fraunces', serif; font-size: 22px; color: #1a3a1a; margin: 0; }
+        .form-label { font-size: 11px; font-weight: 600; color: #5a7a5a; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 10px; }
+        .form-input { width: 100%; border: 1.5px solid #dceeda; border-radius: 12px; padding: 9px 12px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; }
+        .obj-btn { flex: 1; padding: 8px 4px; border-radius: 12px; border: 1.5px solid #d0e8cc; font-size: 12px; font-weight: 600; cursor: pointer; background: #f2faf0; color: #4a7a4a; }
+        .obj-btn.active { background: #3da050; border-color: #3da050; color: white; }
+        .save-btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+        .goals-preview { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 16px; padding: 14px 16px; margin-top: 16px; }
+        .goals-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+        .goal-item { text-align: center; }
+        .goal-val { font-size: 15px; font-weight: 700; font-family: 'Fraunces', serif; }
+        .goal-lbl { font-size: 9px; color: #8aaa7a; }
+        .week-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 8px; }
+        .week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .week-bar-val { font-size: 9px; color: #6b876b; }
+        .week-bar-inner { width: 100%; display: flex; align-items: flex-end; height: 60px; }
+        .week-bar { width: 100%; border-radius: 6px 6px 4px 4px; }
+        .week-day { font-size: 10px; color: #9ab89a; }
+        .week-day.today { color: #3a7a3a; font-weight: 700; }
+        .ai-btn { background: linear-gradient(135deg, #5fc96e, #3da050); border: none; border-radius: 10px; padding: 6px 14px; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .history-day { margin-bottom: 12px; padding: 14px 16px; border-radius: 18px; border: 1px solid #e4eee0; background: #f8fcf7; }
+        .history-day.today { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border-color: #b8e0b0; }
+        .footer { text-align: center; margin-top: 22px; font-size: 11px; color: #a8c4a0; padding-bottom: 20px; }
+        .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 320px); min-height: 400px; }
+        .chat-msgs { flex: 1; overflow-y: auto; padding: 8px 0; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 13px; line-height: 1.5; animation: fadeSlide .2s ease; }
+        .msg-bot { align-self: flex-start; background: #f0f8ee; border: 1px solid #d4eed0; color: #1e3a1e; border-bottom-left-radius: 4px; }
+        .msg-user { align-self: flex-end; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border-bottom-right-radius: 4px; }
+        .msg-typing { align-self: flex-start; background: #f0f8ee; border: 1px solid #d4eed0; border-bottom-left-radius: 4px; padding: 12px 16px; }
+        .typing-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #7aaa7a; margin: 0 2px; animation: typingBounce 1.2s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: .2s; }
+        .typing-dot:nth-child(3) { animation-delay: .4s; }
+        @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+        .chat-input-row { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid #e4eed0; margin-top: 8px; }
+        .chat-input { flex: 1; border: 1.5px solid #dceeda; border-radius: 22px; padding: 10px 16px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; resize: none; max-height: 80px; }
+        .chat-input:focus { border-color: #6abf7a; }
+        .chat-send-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 18px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .chat-send-btn:disabled { background: #c8e4c4; }
+        .quick-asks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .quick-ask { background: #f2faf0; border: 1px solid #cce8c4; border-radius: 99px; padding: 5px 12px; font-size: 11px; color: #3a7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; }
+        /* CAMARA */
+        .cam-container { border-radius: 16px; overflow: hidden; background: #000; position: relative; width: 100%; aspect-ratio: 4/3; margin-bottom: 12px; }
+        #camVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cam-overlay-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: linear-gradient(to bottom, rgba(0,0,0,.5), transparent); }
+        .cam-badge { font-size: 10px; color: #c8f135; background: rgba(200,241,53,0.15); border: 1px solid rgba(200,241,53,0.3); border-radius: 4px; padding: 3px 8px; font-weight: 700; letter-spacing: 1px; }
+        #btnFlip { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 50%; width: 34px; height: 34px; color: white; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .cam-shutter-row { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,.6), transparent); }
+        #btnShutter { width: 62px; height: 62px; border-radius: 50%; background: white; border: 4px solid rgba(255,255,255,.35); cursor: pointer; transition: transform .1s; }
+        #btnShutter:active { transform: scale(.88); }
+        #flashOverlay { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .05s; }
+        #flashOverlay.show { opacity: 0.8; }
+        #noCamMsg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: #8aaa7a; background: #f0f8ee; padding: 20px; text-align: center; }
+        #btnActivarCam { padding: 12px 24px; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .foto-resultado { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; display: none; animation: fadeSlide 0.3s ease; }
+        .foto-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #d8eed4; font-size: 12px; color: #3a5a3a; }
+        .foto-item:last-child { border-bottom: none; }
+        .foto-item-cal { font-weight: 700; color: #3a7a3a; font-family: 'Fraunces', serif; font-size: 14px; }
+        .foto-agregar-btn { width: 100%; padding: 11px; border-radius: 12px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .foto-loading { display: none; text-align: center; padding: 20px; color: #7aaa7a; }
+        canvas { display: none; }
+    </style>
 </head>
-
 <body>
+<div class="wrap">
+    <div class="header">
+        <div class="header-top">
+            <div>
+                <div class="header-label">Mi Registro</div>
+                <h1 class="header-title">Hoy como bien 🌿</h1>
+                <p class="header-sub" id="todayDate"></p>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+                <button class="btn-header" onclick="openHistory()">📅 <span id="historyCount">Historial</span></button>
+                <button class="btn-header" id="profileBtn" onclick="openProfile()">🎯 Metas</button>
+            </div>
+        </div>
+        <div class="ring-wrap">
+            <svg width="130" height="130" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="46" fill="none" stroke="#e2f0de" stroke-width="8"/>
+                <circle id="ringArc" cx="50" cy="50" r="46" fill="none" stroke="#52b86a" stroke-width="8"
+                    stroke-linecap="round" stroke-dasharray="289.03" stroke-dashoffset="289.03"
+                    transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 0.7s,stroke 0.4s"/>
+                <text id="ringVal" x="50" y="46" text-anchor="middle" fill="#1e3a1e" font-size="16" font-weight="700" font-family="Fraunces,serif">0</text>
+                <text x="50" y="58" text-anchor="middle" fill="#8aaa7a" font-size="8">kcal</text>
+            </svg>
+            <div style="flex:1">
+                <div class="remaining" id="remainingBox"><span id="remainingText">2000 kcal libres</span></div>
+                <div id="macroBars"></div>
+            </div>
+        </div>
+    </div>
 
-<h2>Analizar comida</h2>
+    <div style="padding:16px 20px 0">
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-hoy" onclick="setTab('hoy')">🥗 Hoy</button>
+            <button class="tab-btn" id="tab-foto" onclick="setTab('foto')">📷 Foto</button>
+            <button class="tab-btn" id="tab-semana" onclick="setTab('semana')">📊 Semana</button>
+            <button class="tab-btn" id="tab-nutri" onclick="setTab('nutri')">🤖 NutriBot</button>
+        </div>
 
-<button id="btnCamera">📷 Foto</button>
-<button id="btnGallery">🖼 Galería</button>
+        <div id="view-hoy">
+            <div class="card">
+                <div class="card-title">✦ Agregar con IA</div>
+                <div class="meal-btns" id="mealBtns"></div>
+                <div class="search-row">
+                    <input class="search-input" id="searchInput" placeholder="Describí qué comiste..." onkeydown="if(event.key==='Enter')doSearch()"/>
+                    <button class="search-btn" id="searchBtn" onclick="doSearch()">↑</button>
+                </div>
+                <div id="errorBox" style="display:none" class="error-box"></div>
+                <div class="quick-btns" id="quickBtns"></div>
+            </div>
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                    <div class="card-title" style="margin:0">✦ Comidas del día</div>
+                    <button onclick="clearAll()" style="background:none;border:none;color:#c4a8a8;font-size:11px;cursor:pointer">Limpiar todo</button>
+                </div>
+                <div id="foodList"></div>
+            </div>
+            <div class="card" id="adviceCard" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div class="card-title" style="margin:0">✦ Consejo IA</div>
+                    <button class="ai-btn" id="adviceBtn" onclick="getAdvice()">Analizar mi día</button>
+                </div>
+                <div id="adviceContent"></div>
+            </div>
+        </div>
 
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-<input type="file" id="galleryInput" accept="image/*" style="display:none">
+        <div id="view-foto" style="display:none">
+            <div class="card">
+                <div class="card-title">📷 Foto de tu comida</div>
+                <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">La IA detecta los alimentos y calcula las calorias automaticamente.</div>
+                <div class="meal-btns" id="mealBtnsFoto"></div>
 
-<img id="preview">
+                <!-- ESTADO 1: boton inicial -->
+                <div id="estadoInicial">
+                    <button onclick="abrirCamara()" style="width:100%;padding:18px;border-radius:14px;border:2px dashed #a8d8a0;background:#f2faf0;color:#3a7a3a;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px">
+                        <span style="font-size:30px">📷</span>
+                        <div style="text-align:left"><div>Sacar foto a mi comida</div><div style="font-size:11px;font-weight:400;color:#7aaa7a;margin-top:3px">La IA detecta y calcula las calorias</div></div>
+                    </button>
+                </div>
+
+                <!-- ESTADO 2: viewfinder activo -->
+                <div id="estadoCamara" style="display:none">
+                    <div style="border-radius:16px;overflow:hidden;background:#1a2a1a;position:relative;width:100%;aspect-ratio:4/3;margin-bottom:12px">
+                        <!-- Spinner mientras carga -->
+                        <div id="camLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:3">
+                            <div class="spin" style="font-size:28px">🔍</div>
+                            <div style="font-size:12px;color:#7aaa7a">Iniciando camara...</div>
+                        </div>
+                        <!-- Video oculto hasta que este listo -->
+                        <video id="camVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .3s" oncanplay="this.style.opacity=1;document.getElementById('camLoading').style.display='none';var b=document.getElementById('btnShutter');b.disabled=false;b.style.opacity=1"></video>
+                        <div id="flashOverlay" style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s"></div>
+                        <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:linear-gradient(to bottom,rgba(0,0,0,.5),transparent);z-index:2">
+                            <span style="font-size:10px;color:#c8f135;background:rgba(200,241,53,0.15);border:1px solid rgba(200,241,53,0.3);border-radius:4px;padding:3px 8px;font-weight:700;letter-spacing:1px">ENCUADRA TU COMIDA</span>
+                            <button onclick="flipCamara()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:50%;width:34px;height:34px;color:white;font-size:15px;cursor:pointer">🔄</button>
+                        </div>
+                        <div style="position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);z-index:2">
+                            <button id="btnShutter" onclick="capturarYAnalizar()" disabled style="width:66px;height:66px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,.35);cursor:pointer;transition:transform .1s;opacity:0.5"></button>
+                        </div>
+                    </div>
+                    <button onclick="cerrarCamara()" style="width:100%;padding:10px;border-radius:12px;border:1px solid #d0e8cc;background:#f8fcf6;color:#7aaa7a;font-size:13px;cursor:pointer;margin-bottom:10px">Cancelar</button>
+                </div>
+
+                <!-- ESTADO 3: foto tomada + resultado -->
+                <div id="estadoFoto" style="display:none">
+                    <img id="fotoCapturada" style="width:100%;border-radius:16px;margin-bottom:12px" alt="foto"/>
+                    <button onclick="abrirCamara()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid #3da050;background:#f2faf0;color:#3a7a3a;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">📷 Sacar otra foto</button>
+                </div>
+
+                <canvas id="camCanvas" style="display:none"></canvas>
+                <div id="fotoLoading" style="display:none;text-align:center;padding:20px;color:#7aaa7a">
+                    <div style="font-size:36px;margin-bottom:8px"><span class="spin">🔍</span></div>
+                    <div style="font-size:14px;font-weight:700;color:#3a7a3a">Analizando tu comida...</div>
+                    <div style="font-size:12px;color:#8aaa7a;margin-top:4px">Claude esta identificando los alimentos</div>
+                </div>
+                <div id="fotoError" style="display:none" class="error-box"></div>
+                <div id="fotoResultado" class="foto-resultado">
+                    <div style="font-size:11px;color:#7aaa7a;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">✦ Alimentos detectados</div>
+                    <div id="fotoItems"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:2px solid #b8e0b0">
+                        <span style="font-weight:700;color:#1e3a1e;font-size:13px">Total estimado</span>
+                        <span id="fotoTotal" style="font-family:Fraunces,serif;font-size:22px;color:#3a7a3a;font-weight:700"></span>
+                    </div>
+                    <button class="foto-agregar-btn" onclick="agregarFotoAlDia()">✅ Agregar todo al registro del dia</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-semana" style="display:none">
+            <div class="card">
+                <div class="card-title">✦ Semana de calorías</div>
+                <div class="week-bars" id="weekBars"></div>
+            </div>
+            <div class="card" id="weekSummary"></div>
+        </div>
+
+        <div id="view-nutri" style="display:none">
+            <div class="card" style="padding-bottom:8px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                    <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5fc96e,#3da050);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🥦</div>
+                    <div>
+                        <div style="font-weight:700;color:#1e3a1e;font-size:14px">NutriBot</div>
+                        <div style="font-size:11px;color:#7aaa7a">Tu nutricionista con IA · Conoce tus metas</div>
+                    </div>
+                </div>
+                <div class="quick-asks" id="quickAsks">
+                    <button class="quick-ask" onclick="quickAsk('Que puedo comer hoy? Dame un menu completo')">🍽 Menu de hoy</button>
+                    <button class="quick-ask" onclick="quickAsk('Cuantas calorias me faltan para completar mi meta de hoy?')">🔢 Calorias restantes</button>
+                    <button class="quick-ask" onclick="quickAsk('Analiza lo que comi hoy y dame consejos')">💡 Analizar mi dia</button>
+                    <button class="quick-ask" onclick="quickAsk('Que snack saludable me recomiendas para la tarde?')">🍎 Snack saludable</button>
+                    <button class="quick-ask" onclick="quickAsk('Que alimentos ricos en proteina me recomiendas?')">💪 Mas proteina</button>
+                    <button class="quick-ask" onclick="quickAsk('Tengo hambre pero ya casi llene mi meta, que hago?')">😋 Tengo hambre</button>
+                </div>
+                <div class="chat-wrap">
+                    <div class="chat-msgs" id="chatMsgs"></div>
+                    <div class="chat-input-row">
+                        <textarea class="chat-input" id="chatInput" placeholder="Preguntale a NutriBot..." rows="1"
+                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarChat()}"
+                            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+                        <button class="chat-send-btn" id="chatSendBtn" onclick="enviarChat()">↑</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">💾 Datos guardados · Powered by Claude AI</div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="profileModal" style="display:none" onclick="closeProfile()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h2 class="modal-title">Mis metas 🎯</h2>
+            <button onclick="closeProfile()" style="background:none;border:none;font-size:20px;color:#9ab89a;cursor:pointer">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><label class="form-label">Peso (kg)</label><input class="form-input" type="number" id="pWeight" placeholder="70" oninput="updateGoalsPreview()"/></div>
+            <div><label class="form-label">Altura (cm)</label><input class="form-input" type="number" id="pHeight" placeholder="170" oninput="updateGoalsPreview()"/></div>
+            <div><label class="form-label">Edad</label><input class="form-input" type="number" id="pAge" placeholder="25" oninput="updateGoalsPreview()"/></div>
+            <div><label class="form-label">Sexo</label>
+                <select class="form-input" id="pSex" onchange="updateGoalsPreview()">
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+            </div>
+        </div>
+        <label class="form-label">Actividad física</label>
+        <select class="form-input" id="pActivity" onchange="updateGoalsPreview()">
+            <option value="sedentario">Sedentario</option>
+            <option value="ligero">Ligero (1-3 días/sem)</option>
+            <option value="moderado" selected>Moderado (3-5 días/sem)</option>
+            <option value="activo">Activo (6-7 días/sem)</option>
+        </select>
+        <label class="form-label">Objetivo</label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="obj-btn" onclick="setObj('bajar')">Bajar peso</button>
+            <button class="obj-btn active" onclick="setObj('mantener')">Mantener</button>
+            <button class="obj-btn" onclick="setObj('subir')">Subir peso</button>
+        </div>
+        <div class="goals-preview">
+            <div style="font-size:11px;color:#7aaa7a;font-weight:700;text-transform:uppercase">Meta diaria calculada</div>
+            <div class="goals-grid" id="goalsPreview"></div>
+        </div>
+        <button class="save-btn" onclick="saveProfile()">Guardar metas</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="historyModal" style="display:none" onclick="closeHistory()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h2 class="modal-title">Historial 📅</h2>
+            <button onclick="closeHistory()" style="background:none;border:none;font-size:20px;color:#9ab89a;cursor:pointer">✕</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+</div>
 
 <script>
+let API_KEY = "";
+fetch("/api/key").then(r => r.json()).then(d => { API_KEY = d.key; });
+const MODEL = "claude-sonnet-4-20250514";
+const SYSTEM_PROMPT = `Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
+const ADVICE_PROMPT = `Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
+const PHOTO_PROMPT = `Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
+const MEALS = [
+    {key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},
+    {key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},
+    {key:"merienda",label:"Merienda",emoji:"🍵",color:"#f0a050"},
+    {key:"cena",label:"Cena",emoji:"🌙",color:"#7890f0"}
+];
+const QUICK = ["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
+const ACTS = {sedentario:1.2,ligero:1.375,moderado:1.55,activo:1.725};
+const OBJS = {bajar:0.8,mantener:1.0,subir:1.2};
+let activeMeal="desayuno", activeMealFoto="almuerzo", currentObj="mantener";
+let meals=loadLS("ct:meals:"+todayKey(),{desayuno:[],almuerzo:[],merienda:[],cena:[]});
+let profile=loadLS("ct:profile",{});
+let history=loadLS("ct:history",{});
+let fotoItemsDetectados=[];
+let camStream=null, facingMode="environment";
 
-const cameraInput = document.getElementById("cameraInput")
-const galleryInput = document.getElementById("galleryInput")
+// ── NUTRIBOT ──
+let chatHistory = [];
 
-const btnCamera = document.getElementById("btnCamera")
-const btnGallery = document.getElementById("btnGallery")
-
-const preview = document.getElementById("preview")
-
-btnCamera.onclick = ()=>{
-
-cameraInput.value=""
-cameraInput.click()
-
+function buildNutriContext() {
+    const g = getGoals();
+    const t = getTotals();
+    const foods = getAllFoods();
+    const rem = g.calories - t.calories;
+    const p = profile;
+    let ctx = "Eres NutriBot, nutricionista experto, amigable y practico. Respondes en espanol. ";
+    ctx += "PERFIL DEL USUARIO: ";
+    if (p.weight) ctx += "Peso " + p.weight + "kg, altura " + p.height + "cm, edad " + p.age + " anios, sexo " + (p.sex === "M" ? "masculino" : "femenino") + ". ";
+    ctx += "Objetivo: " + (p.objective === "bajar" ? "bajar de peso" : p.objective === "subir" ? "subir de peso" : "mantener peso") + ". ";
+    ctx += "Actividad: " + (p.activity || "moderada") + ". ";
+    ctx += "METAS DIARIAS: " + g.calories + " kcal, " + g.protein + "g proteina, " + g.carbs + "g carbohidratos, " + g.fat + "g grasas, " + g.fiber + "g fibra. ";
+    ctx += "CONSUMIDO HOY: " + Math.round(t.calories) + " kcal, " + Math.round(t.protein) + "g proteina, " + Math.round(t.carbs) + "g carbos, " + Math.round(t.fat) + "g grasas. ";
+    if (rem > 0) ctx += "Le quedan " + Math.round(rem) + " kcal para hoy. ";
+    else ctx += "Ya supero su meta de calorias por " + Math.abs(Math.round(rem)) + " kcal. ";
+    if (foods.length > 0) ctx += "Alimentos de hoy: " + foods.map(f => f.name + " (" + f.calories + "kcal)").join(", ") + ". ";
+    else ctx += "No ha registrado alimentos hoy. ";
+    ctx += "Da respuestas concretas, practicas y motivadoras. Si das un menu, especifica porciones y calorias aproximadas.";
+    return ctx;
 }
 
-btnGallery.onclick = ()=>{
-
-galleryInput.value=""
-galleryInput.click()
-
+async function enviarChat() {
+    const input = document.getElementById("chatInput");
+    const msg = input.value.trim();
+    if (!msg || !API_KEY) return;
+    input.value = "";
+    input.style.height = "auto";
+    document.getElementById("chatSendBtn").disabled = true;
+    document.getElementById("quickAsks").style.display = "none";
+    agregarMensaje(msg, "user");
+    const typing = agregarTyping();
+    chatHistory.push({ role: "user", content: msg });
+    try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+            body: JSON.stringify({ model: MODEL, max_tokens: 800, system: buildNutriContext(), messages: chatHistory })
+        });
+        const data = await res.json();
+        typing.remove();
+        const reply = data.content?.[0]?.text || "No pude responder. Intenta de nuevo.";
+        chatHistory.push({ role: "assistant", content: reply });
+        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+        agregarMensaje(reply, "bot");
+    } catch (e) {
+        typing.remove();
+        agregarMensaje("Error de conexion. Revisa tu internet.", "bot");
+    }
+    document.getElementById("chatSendBtn").disabled = false;
 }
 
-cameraInput.addEventListener("change",(e)=>{
-
-if(!e.target.files.length)return
-
-const file=e.target.files[0]
-
-procesar(file)
-
-})
-
-galleryInput.addEventListener("change",(e)=>{
-
-if(!e.target.files.length)return
-
-const file=e.target.files[0]
-
-procesar(file)
-
-})
-
-function procesar(file){
-
-const reader=new FileReader()
-
-reader.onload=function(e){
-
-preview.src=e.target.result
-analizar(e.target.result)
-
+function quickAsk(msg) {
+    document.getElementById("chatInput").value = msg;
+    enviarChat();
 }
 
-reader.readAsDataURL(file)
-
+function agregarMensaje(texto, tipo) {
+    const msgs = document.getElementById("chatMsgs");
+    const div = document.createElement("div");
+    div.className = "msg msg-" + tipo;
+    div.textContent = texto;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
 }
 
-function analizar(img){
-
-console.log("imagen lista para analizar")
-
+function agregarTyping() {
+    const msgs = document.getElementById("chatMsgs");
+    const div = document.createElement("div");
+    div.className = "msg-typing";
+    div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
 }
 
+function initChat() {
+    if (chatHistory.length === 0) {
+        const g = getGoals();
+        const t = getTotals();
+        const hora = new Date().getHours();
+        const saludo = hora < 12 ? "Buenos dias" : hora < 19 ? "Buenas tardes" : "Buenas noches";
+        const rem = Math.round(g.calories - t.calories);
+        let bienvenida = saludo + "! Soy NutriBot, tu nutricionista personal. ";
+        if (profile.weight) {
+            bienvenida += "Tu meta es " + g.calories + " kcal diarias para " + (profile.objective === "bajar" ? "bajar de peso" : profile.objective === "subir" ? "subir de peso" : "mantener tu peso") + ". ";
+        } else {
+            bienvenida += "Veo que aun no configuraste tu perfil. Te recomiendo ir a Metas para personalizar tu plan. ";
+        }
+        if (rem > 0) bienvenida += "Hoy te quedan " + rem + " kcal disponibles. ";
+        bienvenida += "Como puedo ayudarte?";
+        agregarMensaje(bienvenida, "bot");
+        chatHistory.push({ role: "assistant", content: bienvenida });
+    }
+}
+
+function todayKey(){return new Date().toISOString().split("T")[0];}
+function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+async function abrirCamara(){
+    document.getElementById("estadoInicial").style.display="none";
+    document.getElementById("estadoFoto").style.display="none";
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("fotoError").style.display="none";
+    document.getElementById("estadoCamara").style.display="block";
+    try{
+        if(camStream) camStream.getTracks().forEach(t=>t.stop());
+        camStream=await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:{ideal:facingMode},width:{ideal:1280},height:{ideal:720}},audio:false
+        });
+        document.getElementById("camVideo").srcObject=camStream;
+    }catch(e){
+        document.getElementById("estadoCamara").style.display="none";
+        document.getElementById("estadoInicial").style.display="block";
+        alert("No se pudo acceder a la camara. Verificá los permisos.");
+    }
+}
+function cerrarCamara(){
+    if(camStream) camStream.getTracks().forEach(t=>t.stop());
+    camStream=null;
+    document.getElementById("estadoCamara").style.display="none";
+    document.getElementById("estadoInicial").style.display="block";
+}
+function flipCamara(){
+    facingMode=facingMode==="environment"?"user":"environment";
+    abrirCamara();
+}
+async function capturarYAnalizar(){
+    const video=document.getElementById("camVideo");
+    const canvas=document.getElementById("camCanvas");
+    if(!camStream||!video.videoWidth) return;
+    const flash=document.getElementById("flashOverlay");
+    flash.style.opacity="0.8";
+    setTimeout(()=>flash.style.opacity="0",180);
+    canvas.width=video.videoWidth;
+    canvas.height=video.videoHeight;
+    canvas.getContext("2d").drawImage(video,0,0);
+    const dataURL=canvas.toDataURL("image/jpeg",0.85);
+    const base64=dataURL.split(",")[1];
+    if(camStream) camStream.getTracks().forEach(t=>t.stop());
+    camStream=null;
+    document.getElementById("estadoCamara").style.display="none";
+    document.getElementById("estadoFoto").style.display="block";
+    document.getElementById("fotoCapturada").src=dataURL;
+    document.getElementById("fotoLoading").style.display="block";
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("fotoError").style.display="none";
+    document.getElementById("btnShutter").disabled=true;
+    try{
+        const res=await fetch("https://api.anthropic.com/v1/messages",{
+            method:"POST",
+            headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+            body:JSON.stringify({model:MODEL,max_tokens:1000,messages:[{role:"user",content:[
+                {type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64}},
+                {type:"text",text:PHOTO_PROMPT}
+            ]}]})
+        });
+        const data=await res.json();
+        document.getElementById("fotoLoading").style.display="none";
+        if(data.error){
+            document.getElementById("fotoError").textContent="Error: "+data.error.message;
+            document.getElementById("fotoError").style.display="block";
+        }else{
+            const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+            const match=text?.match(/\{[\s\S]*\}/);
+            if(!match){
+                document.getElementById("fotoError").textContent="No pude analizar la imagen. Intenta de nuevo.";
+                document.getElementById("fotoError").style.display="block";
+            }else{
+                const resultado=JSON.parse(match[0]);
+                fotoItemsDetectados=resultado.items||[];
+                const total=fotoItemsDetectados.reduce((a,f)=>a+f.calories,0);
+                document.getElementById("fotoItems").innerHTML=fotoItemsDetectados.map(f=>
+                    `<div class="foto-item"><span>${f.emoji} <strong>${f.name}</strong> <span style="color:#9ab89a;font-size:10px">(${f.portion})</span></span><span class="foto-item-cal">${f.calories} kcal</span></div>`
+                ).join("");
+                document.getElementById("fotoTotal").textContent=Math.round(total)+" kcal";
+                document.getElementById("fotoResultado").style.display="block";
+            }
+        }
+    }catch(e){
+        document.getElementById("fotoLoading").style.display="none";
+        document.getElementById("fotoError").textContent="Error: "+e.message;
+        document.getElementById("fotoError").style.display="block";
+    }
+    document.getElementById("btnShutter").disabled=false;
+}
+function agregarFotoAlDia(){
+    if(!fotoItemsDetectados.length) return;
+    const nuevos=fotoItemsDetectados.map(f=>({
+        id:Date.now()+Math.random(),name:f.name,emoji:f.emoji,
+        calories:Number(f.calories)||0,protein:Number(f.protein)||0,
+        carbs:Number(f.carbs)||0,fat:Number(f.fat)||0,fiber:Number(f.fiber)||0,portion:f.portion||"1 porcion"
+    }));
+    persistMeals({...meals,[activeMealFoto]:[...nuevos,...meals[activeMealFoto]]});
+    fotoItemsDetectados=[];
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("estadoFoto").style.display="none";
+    document.getElementById("estadoInicial").style.display="block";
+    setTab("hoy");
+}
+
+function calcGoals(p){
+    const w=Number(p.weight)||70,h=Number(p.height)||170,a=Number(p.age)||25;
+    const bmr=p.sex==="F"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
+    const cal=Math.round(bmr*(ACTS[p.activity]||1.55)*(OBJS[p.objective]||1));
+    return{calories:cal,protein:Math.round(w*1.8),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:30};
+}
+function getGoals(){return profile.weight?calcGoals(profile):{calories:2000,protein:150,carbs:250,fat:65,fiber:30};}
+function getAllFoods(){return Object.values(meals).flat();}
+function getTotals(){return getAllFoods().reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat,fiber:a.fiber+f.fiber}),{calories:0,protein:0,carbs:0,fat:0,fiber:0});}
+function persistMeals(upd){
+    meals=upd;const t=todayKey();history[t]=upd;
+    saveLS("ct:meals:"+t,upd);saveLS("ct:history",history);render();
+}
+function render(){
+    document.getElementById("todayDate").textContent=new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+    const g=getGoals(),t=getTotals();
+    const circ=289.03,pct=Math.min(t.calories/g.calories,1);
+    const color=t.calories>g.calories?"#e8806a":t.calories>g.calories*0.8?"#f0b84a":"#52b86a";
+    document.getElementById("ringArc").setAttribute("stroke-dashoffset",circ*(1-pct));
+    document.getElementById("ringArc").setAttribute("stroke",color);
+    document.getElementById("ringVal").textContent=Math.round(t.calories);
+    const rem=g.calories-t.calories;
+    const box=document.getElementById("remainingBox"),txt=document.getElementById("remainingText");
+    if(rem>=0){box.style.background="#f0fced";box.style.border="1px solid #c8e8c0";txt.style.color="#3a7a3a";txt.textContent=Math.round(rem)+" kcal libres";}
+    else{box.style.background="#fff0ec";box.style.border="1px solid #f0c8b8";txt.style.color="#c05a3a";txt.textContent=Math.abs(Math.round(rem))+" kcal de mas";}
+    document.getElementById("macroBars").innerHTML=[["Proteina",t.protein,g.protein,"#52c478"],["Carbohidratos",t.carbs,g.carbs,"#f0c050"],["Grasas",t.fat,g.fat,"#f07a5a"],["Fibra",t.fiber,g.fiber,"#78c0f0"]].map(([l,v,m,c])=>`<div class="macro-row"><span style="font-weight:600">${l}</span><span>${Math.round(v)}/${m}g</span></div><div class="macro-bg"><div class="macro-fill" style="width:${Math.min(v/m*100,100)}%;background:${c}"></div></div>`).join("");
+    document.getElementById("mealBtns").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMeal===m.key?" active":""}" style="${activeMeal===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMeal('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("mealBtnsFoto").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMealFoto===m.key?" active":""}" style="${activeMealFoto===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMealFoto('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("searchInput").placeholder="Agregar a "+MEALS.find(m=>m.key===activeMeal).label.toLowerCase()+"...";
+    document.getElementById("quickBtns").innerHTML=QUICK.map(s=>`<button class="quick-btn" onclick="quickSearch('${s}')">${s}</button>`).join("");
+    let html="";
+    MEALS.forEach(meal=>{
+        const mf=meals[meal.key];if(!mf.length)return;
+        const mc=mf.reduce((a,f)=>a+f.calories,0);
+        html+=`<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:16px">${meal.emoji}</span><span style="font-weight:700;color:#1e3a1e;font-size:13px">${meal.label}</span><span style="font-size:11px;color:#9ab89a;margin-left:auto">${Math.round(mc)} kcal</span></div>`;
+        mf.forEach(f=>{html+=`<div class="food-card"><span class="food-emoji">${f.emoji}</span><div style="flex:1;min-width:0"><div class="food-name">${f.name}</div><div class="food-portion">${f.portion}</div></div><div style="display:flex;align-items:center;flex-shrink:0"><div class="food-macro"><div class="food-macro-val" style="color:#5aba72">${Math.round(f.protein)}</div><div class="food-macro-lbl">P</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f0b84a">${Math.round(f.carbs)}</div><div class="food-macro-lbl">C</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f07a5a">${Math.round(f.fat)}</div><div class="food-macro-lbl">G</div></div><div style="text-align:center;margin:0 4px"><div class="food-cal">${f.calories}</div><div class="food-cal-lbl">kcal</div></div><button class="remove-btn" onclick="removeFood('${meal.key}',${f.id})">✕</button></div></div>`;});
+        html+="</div>";
+    });
+    if(!getAllFoods().length)html=`<div class="empty-state"><div style="font-size:44px;margin-bottom:12px">🥗</div><div style="font-size:16px;color:#90b080;margin-bottom:6px">Tu plato esta vacio</div><div style="font-size:12px">Selecciona una comida y describí qué comiste</div></div>`;
+    document.getElementById("foodList").innerHTML=html;
+    document.getElementById("adviceCard").style.display=getAllFoods().length?"block":"none";
+    const dias=Object.keys(history).filter(d=>d!==todayKey()).length;
+    document.getElementById("historyCount").textContent=dias>0?dias+"d":"Historial";
+    if(document.getElementById("view-semana").style.display!=="none")renderWeek();
+}
+function setMeal(key){activeMeal=key;render();}
+function setMealFoto(key){activeMealFoto=key;render();}
+function setTab(tab){
+    ["hoy","foto","semana"].forEach(t=>{
+        document.getElementById("view-"+t).style.display=t===tab?"block":"none";
+        document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
+    });
+    // camara se abre con boton
+    if(tab==="semana")renderWeek();
+}
+function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
+function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
+async function doSearch(){
+    const input=document.getElementById("searchInput");
+    const q=input.value.trim();if(!q)return;
+    const btn=document.getElementById("searchBtn");
+    btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span>';setError("");
+    try{
+        const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:400,system:SYSTEM_PROMPT,messages:[{role:"user",content:q}]})});
+        const data=await res.json();
+        if(data.error){setError("Error: "+data.error.message);btn.disabled=false;btn.innerHTML="↑";return;}
+        const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+        const match=text?.match(/\{[\s\S]*\}/);
+        if(!match){setError("Respuesta invalida");btn.disabled=false;btn.innerHTML="↑";return;}
+        const parsed=JSON.parse(match[0]);
+        if(parsed.error){setError("No reconoci ese alimento 🌿");btn.disabled=false;btn.innerHTML="↑";return;}
+        const food={id:Date.now(),name:parsed.name||q,emoji:parsed.emoji||"🍽️",calories:Number(parsed.calories)||0,protein:Number(parsed.protein)||0,carbs:Number(parsed.carbs)||0,fat:Number(parsed.fat)||0,fiber:Number(parsed.fiber)||0,portion:parsed.portion||"1 porcion"};
+        persistMeals({...meals,[activeMeal]:[food,...meals[activeMeal]]});
+        input.value="";input.focus();
+    }catch(e){setError("Error: "+e.message);}
+    btn.disabled=false;btn.innerHTML="↑";
+}
+function removeFood(mk,id){persistMeals({...meals,[mk]:meals[mk].filter(f=>f.id!=id)});}
+function clearAll(){persistMeals({desayuno:[],almuerzo:[],merienda:[],cena:[]});}
+async function getAdvice(){
+    const foods=getAllFoods();if(!foods.length)return;
+    const btn=document.getElementById("adviceBtn");btn.textContent="...";btn.disabled=true;
+    const t=getTotals(),g=getGoals();
+    const summary=`Calorias:${Math.round(t.calories)}/${g.calories}kcal Proteina:${Math.round(t.protein)}g Carbos:${Math.round(t.carbs)}g Grasas:${Math.round(t.fat)}g Fibra:${Math.round(t.fiber)}g Alimentos:${foods.map(f=>f.name).join(",")}`;
+    try{
+        const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:500,system:ADVICE_PROMPT,messages:[{role:"user",content:summary}]})});
+        const data=await res.json();
+        const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+        const match=text?.match(/\{[\s\S]*\}/);
+        if(!match){btn.textContent="Analizar mi dia";btn.disabled=false;return;}
+        const a=JSON.parse(match[0]);
+        document.getElementById("adviceContent").innerHTML=`<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#ecf8e8;border:1px solid #cce8c4;margin-bottom:12px"><div style="font-size:32px">${a.emoji}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:22px;color:#3a7a3a;font-weight:700;font-family:Fraunces,serif">${a.score}</span><span style="font-size:11px;color:#7aaa7a">/10</span><div style="flex:1;height:6px;border-radius:99px;background:#d8eed4;margin-left:4px"><div style="height:100%;width:${a.score*10}%;border-radius:99px;background:${a.score>=7?"#52c478":a.score>=5?"#f0c050":"#f07a5a"}"></div></div></div><div style="font-size:12px;color:#3a5a3a;font-weight:500">${a.summary}</div></div></div><div style="padding:10px 14px;border-radius:14px;background:#f8fff6;border:1px solid #d8eed4;margin-bottom:8px"><div style="font-size:11px;color:#52a062;font-weight:700">💚 ${a.highlight}</div></div><div style="font-size:11px;color:#5a7a5a;font-weight:700;margin-bottom:6px">SUGERENCIAS</div>${a.tips.map((tip,i)=>`<div style="display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:#3a5a3a;line-height:1.4"><span style="color:#7acd8a;font-weight:700;flex-shrink:0">${i+1}.</span>${tip}</div>`).join("")}</div>`;
+        btn.textContent="Actualizar";
+    }catch(e){btn.textContent="Analizar mi dia";}
+    btn.disabled=false;
+}
+function setObj(key){currentObj=key;document.querySelectorAll(".obj-btn").forEach((b,i)=>{b.className="obj-btn"+(["bajar","mantener","subir"][i]===key?" active":"");});updateGoalsPreview();}
+function updateGoalsPreview(){
+    const p={weight:document.getElementById("pWeight").value,height:document.getElementById("pHeight").value,age:document.getElementById("pAge").value,sex:document.getElementById("pSex").value,activity:document.getElementById("pActivity").value,objective:currentObj};
+    const g=calcGoals(p);
+    document.getElementById("goalsPreview").innerHTML=[["Cal",g.calories,"#3a7a3a"],["Prot",g.protein,"#52c478"],["Carbs",g.carbs,"#f0c050"],["Grasas",g.fat,"#f07a5a"],["Fibra",g.fiber,"#78c0f0"]].map(([l,v,c])=>`<div class="goal-item"><div class="goal-val" style="color:${c}">${v}</div><div class="goal-lbl">${l}</div></div>`).join("");
+}
+function openProfile(){
+    if(profile.weight)document.getElementById("pWeight").value=profile.weight;
+    if(profile.height)document.getElementById("pHeight").value=profile.height;
+    if(profile.age)document.getElementById("pAge").value=profile.age;
+    if(profile.sex)document.getElementById("pSex").value=profile.sex;
+    if(profile.activity)document.getElementById("pActivity").value=profile.activity;
+    if(profile.objective){currentObj=profile.objective;setObj(currentObj);}
+    updateGoalsPreview();
+    document.getElementById("profileModal").style.display="flex";
+}
+function closeProfile(){document.getElementById("profileModal").style.display="none";}
+function saveProfile(){
+    profile={weight:document.getElementById("pWeight").value,height:document.getElementById("pHeight").value,age:document.getElementById("pAge").value,sex:document.getElementById("pSex").value,activity:document.getElementById("pActivity").value,objective:currentObj};
+    saveLS("ct:profile",profile);
+    const btn=document.getElementById("profileBtn");btn.style.background="linear-gradient(135deg,#5fc96e,#3da050)";btn.style.color="white";
+    closeProfile();render();
+}
+function openHistory(){
+    const days=Object.keys(history).sort((a,b)=>b.localeCompare(a)).slice(0,14);
+    const g=getGoals();let html="";
+    if(!days.length){html=`<div style="text-align:center;padding:40px 0"><div style="font-size:40px">📭</div><div style="font-size:16px;color:#90b080;margin-top:10px">Sin historial aun</div></div>`;}
+    else days.forEach(day=>{
+        const af=Object.values(history[day]||{}).flat();
+        const tot=af.reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat}),{calories:0,protein:0,carbs:0,fat:0});
+        const pct=Math.min(tot.calories/g.calories*100,100),isToday=day===todayKey();
+        const fmt=new Date(day+"T12:00:00").toLocaleDateString("es-AR",{weekday:"short",day:"numeric",month:"short"});
+        html+=`<div class="history-day${isToday?" today":""}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span style="font-weight:700;color:#1e3a1e;font-size:13px">${isToday?"Hoy · ":""}${fmt}</span><span style="font-size:11px;color:#8aaa7a;margin-left:6px">${af.length} alimentos</span></div><span style="font-size:16px;font-weight:700;color:${tot.calories>g.calories?"#e8806a":"#3a7a3a"}">${Math.round(tot.calories)} kcal</span></div><div style="height:5px;border-radius:99px;background:#e4f0e0;margin-bottom:8px"><div style="height:100%;width:${pct}%;border-radius:99px;background:${tot.calories>g.calories?"#e8806a":"#52b86a"}"></div></div><div style="display:flex;flex-wrap:wrap;gap:4px">${af.slice(0,5).map(f=>`<span style="font-size:11px;background:white;border:1px solid #d8eed4;border-radius:99px;padding:2px 8px;color:#4a7a4a">${f.emoji} ${f.name}</span>`).join("")}${af.length>5?`<span style="font-size:11px;color:#9ab89a">+${af.length-5} mas</span>`:""}</div></div>`;
+    });
+    document.getElementById("historyList").innerHTML=html;
+    document.getElementById("historyModal").style.display="flex";
+}
+function closeHistory(){document.getElementById("historyModal").style.display="none";}
+function renderWeek(){
+    const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split("T")[0];});
+    const names=["D","L","M","X","J","V","S"],g=getGoals(),maxV=g.calories*1.3;
+    document.getElementById("weekBars").innerHTML=days.map(day=>{
+        const foods=Object.values(history[day]||{}).flat();
+        const cal=foods.reduce((a,f)=>a+f.calories,0);
+        const pct=cal>0?Math.min(cal/maxV*100,100):0;
+        const isToday=day===todayKey(),over=cal>g.calories;
+        const bg=isToday?"#3da050":over?"#e8806a":cal>0?"#7acd8a":"#e4f0e0";
+        const d=new Date(day+"T12:00:00");
+        return `<div class="week-bar-wrap">${cal>0?`<div class="week-bar-val" style="color:${over?"#e8806a":"#6b876b"}">${Math.round(cal/100)/10}k</div>`:""}<div class="week-bar-inner"><div class="week-bar" style="height:${Math.max(pct,4)}%;background:${bg};min-height:${cal>0?8:4}px"></div></div><div class="week-day${isToday?" today":""}">${names[d.getDay()]}</div></div>`;
+    }).join("");
+    const dwd=days.filter(d=>history[d]&&Object.values(history[d]).flat().length>0);
+    if(!dwd.length){document.getElementById("weekSummary").innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:36px">📊</div><div style="color:#90b080;margin-top:8px">Registra comidas para ver tu progreso</div></div>`;return;}
+    const avgCal=Math.round(dwd.reduce((a,d)=>a+Object.values(history[d]).flat().reduce((x,f)=>x+f.calories,0),0)/dwd.length);
+    const diff=avgCal-g.calories;
+    document.getElementById("weekSummary").innerHTML=`<div class="card-title">✦ Resumen semanal</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[["📊","Promedio diario",avgCal+" kcal","#3a7a3a"],["📅","Dias registrados",dwd.length+" de 7","#5a8a5a"],["🎯","Meta diaria",g.calories+" kcal","#5a6a9a"],[diff>0?"⬆️":"✅","Diferencia prom.",(diff>0?"+":"")+diff+" kcal",diff>0?"#c05a3a":"#3a7a3a"]].map(([icon,lbl,val,color])=>`<div style="padding:12px 14px;border-radius:14px;background:#f8fcf6;border:1px solid #e0eede"><div style="font-size:18px;margin-bottom:4px">${icon}</div><div style="font-size:17px;color:${color};font-weight:700;font-family:Fraunces,serif">${val}</div><div style="font-size:11px;color:#9ab89a;margin-top:2px">${lbl}</div></div>`).join("")}</div>`;
+}
+render();
 </script>
-
 </body>
 </html>
