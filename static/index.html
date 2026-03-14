@@ -80,6 +80,23 @@
         .history-day { margin-bottom: 12px; padding: 14px 16px; border-radius: 18px; border: 1px solid #e4eee0; background: #f8fcf7; }
         .history-day.today { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border-color: #b8e0b0; }
         .footer { text-align: center; margin-top: 22px; font-size: 11px; color: #a8c4a0; padding-bottom: 20px; }
+        .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 320px); min-height: 400px; }
+        .chat-msgs { flex: 1; overflow-y: auto; padding: 8px 0; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 13px; line-height: 1.5; animation: fadeSlide .2s ease; }
+        .msg-bot { align-self: flex-start; background: #f0f8ee; border: 1px solid #d4eed0; color: #1e3a1e; border-bottom-left-radius: 4px; }
+        .msg-user { align-self: flex-end; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border-bottom-right-radius: 4px; }
+        .msg-typing { align-self: flex-start; background: #f0f8ee; border: 1px solid #d4eed0; border-bottom-left-radius: 4px; padding: 12px 16px; }
+        .typing-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #7aaa7a; margin: 0 2px; animation: typingBounce 1.2s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: .2s; }
+        .typing-dot:nth-child(3) { animation-delay: .4s; }
+        @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+        .chat-input-row { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid #e4eed0; margin-top: 8px; }
+        .chat-input { flex: 1; border: 1.5px solid #dceeda; border-radius: 22px; padding: 10px 16px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; resize: none; max-height: 80px; }
+        .chat-input:focus { border-color: #6abf7a; }
+        .chat-send-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 18px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .chat-send-btn:disabled { background: #c8e4c4; }
+        .quick-asks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .quick-ask { background: #f2faf0; border: 1px solid #cce8c4; border-radius: 99px; padding: 5px 12px; font-size: 11px; color: #3a7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; }
         /* CAMARA */
         .cam-container { border-radius: 16px; overflow: hidden; background: #000; position: relative; width: 100%; aspect-ratio: 4/3; margin-bottom: 12px; }
         #camVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -137,6 +154,7 @@
             <button class="tab-btn active" id="tab-hoy" onclick="setTab('hoy')">🥗 Hoy</button>
             <button class="tab-btn" id="tab-foto" onclick="setTab('foto')">📷 Foto</button>
             <button class="tab-btn" id="tab-semana" onclick="setTab('semana')">📊 Semana</button>
+            <button class="tab-btn" id="tab-nutri" onclick="setTab('nutri')">🤖 NutriBot</button>
         </div>
 
         <div id="view-hoy">
@@ -235,6 +253,35 @@
             <div class="card" id="weekSummary"></div>
         </div>
 
+        <div id="view-nutri" style="display:none">
+            <div class="card" style="padding-bottom:8px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                    <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5fc96e,#3da050);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🥦</div>
+                    <div>
+                        <div style="font-weight:700;color:#1e3a1e;font-size:14px">NutriBot</div>
+                        <div style="font-size:11px;color:#7aaa7a">Tu nutricionista con IA · Conoce tus metas</div>
+                    </div>
+                </div>
+                <div class="quick-asks" id="quickAsks">
+                    <button class="quick-ask" onclick="quickAsk('Que puedo comer hoy? Dame un menu completo')">🍽 Menu de hoy</button>
+                    <button class="quick-ask" onclick="quickAsk('Cuantas calorias me faltan para completar mi meta de hoy?')">🔢 Calorias restantes</button>
+                    <button class="quick-ask" onclick="quickAsk('Analiza lo que comi hoy y dame consejos')">💡 Analizar mi dia</button>
+                    <button class="quick-ask" onclick="quickAsk('Que snack saludable me recomiendas para la tarde?')">🍎 Snack saludable</button>
+                    <button class="quick-ask" onclick="quickAsk('Que alimentos ricos en proteina me recomiendas?')">💪 Mas proteina</button>
+                    <button class="quick-ask" onclick="quickAsk('Tengo hambre pero ya casi llene mi meta, que hago?')">😋 Tengo hambre</button>
+                </div>
+                <div class="chat-wrap">
+                    <div class="chat-msgs" id="chatMsgs"></div>
+                    <div class="chat-input-row">
+                        <textarea class="chat-input" id="chatInput" placeholder="Preguntale a NutriBot..." rows="1"
+                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarChat()}"
+                            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+                        <button class="chat-send-btn" id="chatSendBtn" onclick="enviarChat()">↑</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="footer">💾 Datos guardados · Powered by Claude AI</div>
     </div>
 </div>
@@ -309,6 +356,105 @@ let profile=loadLS("ct:profile",{});
 let history=loadLS("ct:history",{});
 let fotoItemsDetectados=[];
 let camStream=null, facingMode="environment";
+
+// ── NUTRIBOT ──
+let chatHistory = [];
+
+function buildNutriContext() {
+    const g = getGoals();
+    const t = getTotals();
+    const foods = getAllFoods();
+    const rem = g.calories - t.calories;
+    const p = profile;
+    let ctx = "Eres NutriBot, nutricionista experto, amigable y practico. Respondes en espanol. ";
+    ctx += "PERFIL DEL USUARIO: ";
+    if (p.weight) ctx += "Peso " + p.weight + "kg, altura " + p.height + "cm, edad " + p.age + " anios, sexo " + (p.sex === "M" ? "masculino" : "femenino") + ". ";
+    ctx += "Objetivo: " + (p.objective === "bajar" ? "bajar de peso" : p.objective === "subir" ? "subir de peso" : "mantener peso") + ". ";
+    ctx += "Actividad: " + (p.activity || "moderada") + ". ";
+    ctx += "METAS DIARIAS: " + g.calories + " kcal, " + g.protein + "g proteina, " + g.carbs + "g carbohidratos, " + g.fat + "g grasas, " + g.fiber + "g fibra. ";
+    ctx += "CONSUMIDO HOY: " + Math.round(t.calories) + " kcal, " + Math.round(t.protein) + "g proteina, " + Math.round(t.carbs) + "g carbos, " + Math.round(t.fat) + "g grasas. ";
+    if (rem > 0) ctx += "Le quedan " + Math.round(rem) + " kcal para hoy. ";
+    else ctx += "Ya supero su meta de calorias por " + Math.abs(Math.round(rem)) + " kcal. ";
+    if (foods.length > 0) ctx += "Alimentos de hoy: " + foods.map(f => f.name + " (" + f.calories + "kcal)").join(", ") + ". ";
+    else ctx += "No ha registrado alimentos hoy. ";
+    ctx += "Da respuestas concretas, practicas y motivadoras. Si das un menu, especifica porciones y calorias aproximadas.";
+    return ctx;
+}
+
+async function enviarChat() {
+    const input = document.getElementById("chatInput");
+    const msg = input.value.trim();
+    if (!msg || !API_KEY) return;
+    input.value = "";
+    input.style.height = "auto";
+    document.getElementById("chatSendBtn").disabled = true;
+    document.getElementById("quickAsks").style.display = "none";
+    agregarMensaje(msg, "user");
+    const typing = agregarTyping();
+    chatHistory.push({ role: "user", content: msg });
+    try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-api-key": API_KEY, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+            body: JSON.stringify({ model: MODEL, max_tokens: 800, system: buildNutriContext(), messages: chatHistory })
+        });
+        const data = await res.json();
+        typing.remove();
+        const reply = data.content?.[0]?.text || "No pude responder. Intenta de nuevo.";
+        chatHistory.push({ role: "assistant", content: reply });
+        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+        agregarMensaje(reply, "bot");
+    } catch (e) {
+        typing.remove();
+        agregarMensaje("Error de conexion. Revisa tu internet.", "bot");
+    }
+    document.getElementById("chatSendBtn").disabled = false;
+}
+
+function quickAsk(msg) {
+    document.getElementById("chatInput").value = msg;
+    enviarChat();
+}
+
+function agregarMensaje(texto, tipo) {
+    const msgs = document.getElementById("chatMsgs");
+    const div = document.createElement("div");
+    div.className = "msg msg-" + tipo;
+    div.textContent = texto;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+}
+
+function agregarTyping() {
+    const msgs = document.getElementById("chatMsgs");
+    const div = document.createElement("div");
+    div.className = "msg-typing";
+    div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+}
+
+function initChat() {
+    if (chatHistory.length === 0) {
+        const g = getGoals();
+        const t = getTotals();
+        const hora = new Date().getHours();
+        const saludo = hora < 12 ? "Buenos dias" : hora < 19 ? "Buenas tardes" : "Buenas noches";
+        const rem = Math.round(g.calories - t.calories);
+        let bienvenida = saludo + "! Soy NutriBot, tu nutricionista personal. ";
+        if (profile.weight) {
+            bienvenida += "Tu meta es " + g.calories + " kcal diarias para " + (profile.objective === "bajar" ? "bajar de peso" : profile.objective === "subir" ? "subir de peso" : "mantener tu peso") + ". ";
+        } else {
+            bienvenida += "Veo que aun no configuraste tu perfil. Te recomiendo ir a Metas para personalizar tu plan. ";
+        }
+        if (rem > 0) bienvenida += "Hoy te quedan " + rem + " kcal disponibles. ";
+        bienvenida += "Como puedo ayudarte?";
+        agregarMensaje(bienvenida, "bot");
+        chatHistory.push({ role: "assistant", content: bienvenida });
+    }
+}
 
 function todayKey(){return new Date().toISOString().split("T")[0];}
 function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
