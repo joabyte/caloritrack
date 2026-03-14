@@ -93,8 +93,6 @@
         #flashOverlay.show { opacity: 0.8; }
         #noCamMsg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: #8aaa7a; background: #f0f8ee; padding: 20px; text-align: center; }
         #btnActivarCam { padding: 12px 24px; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
-        #fotoCapturada { width: 100%; border-radius: 16px; margin-bottom: 12px; display: none; }
-        .btn-nueva-foto { width: 100%; padding: 11px; border-radius: 12px; border: 1.5px solid #3da050; background: #f2faf0; color: #3a7a3a; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
         .foto-resultado { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; display: none; animation: fadeSlide 0.3s ease; }
         .foto-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #d8eed4; font-size: 12px; color: #3a5a3a; }
         .foto-item:last-child { border-bottom: none; }
@@ -171,30 +169,44 @@
         <div id="view-foto" style="display:none">
             <div class="card">
                 <div class="card-title">📷 Foto de tu comida</div>
-                <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">La IA detecta los alimentos y calcula las calorías automáticamente.</div>
+                <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">La IA detecta los alimentos y calcula las calorias automaticamente.</div>
                 <div class="meal-btns" id="mealBtnsFoto"></div>
-                <div class="cam-container">
-                    <div id="noCamMsg">
-                        <div style="font-size:40px">📷</div>
-                        <div>Necesita acceso a la cámara</div>
-                        <button id="btnActivarCam" onclick="activarCamara()">ACTIVAR CÁMARA</button>
-                        <div id="camError" style="font-size:11px;color:#c06050;margin-top:4px;display:none"></div>
-                    </div>
-                    <video id="camVideo" autoplay playsinline muted style="display:none"></video>
-                    <div id="flashOverlay"></div>
-                    <div class="cam-overlay-bar" id="camOverlayBar" style="display:none">
-                        <span class="cam-badge" id="camBadge">EN VIVO</span>
-                        <button id="btnFlip" onclick="flipCamara()">🔄</button>
-                    </div>
-                    <div class="cam-shutter-row" id="camShutterRow" style="display:none">
-                        <button id="btnShutter" onclick="capturarYAnalizar()"></button>
-                    </div>
+
+                <!-- ESTADO 1: boton inicial -->
+                <div id="estadoInicial">
+                    <button onclick="abrirCamara()" style="width:100%;padding:18px;border-radius:14px;border:2px dashed #a8d8a0;background:#f2faf0;color:#3a7a3a;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px">
+                        <span style="font-size:30px">📷</span>
+                        <div style="text-align:left"><div>Sacar foto a mi comida</div><div style="font-size:11px;font-weight:400;color:#7aaa7a;margin-top:3px">La IA detecta y calcula las calorias</div></div>
+                    </button>
                 </div>
-                <canvas id="camCanvas"></canvas>
-                <div id="fotoLoading" class="foto-loading">
+
+                <!-- ESTADO 2: viewfinder activo -->
+                <div id="estadoCamara" style="display:none">
+                    <div style="border-radius:16px;overflow:hidden;background:#000;position:relative;width:100%;aspect-ratio:4/3;margin-bottom:12px">
+                        <video id="camVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+                        <div id="flashOverlay" style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s"></div>
+                        <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:linear-gradient(to bottom,rgba(0,0,0,.5),transparent)">
+                            <span style="font-size:10px;color:#c8f135;background:rgba(200,241,53,0.15);border:1px solid rgba(200,241,53,0.3);border-radius:4px;padding:3px 8px;font-weight:700;letter-spacing:1px">ENCUADRA TU COMIDA</span>
+                            <button onclick="flipCamara()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:50%;width:34px;height:34px;color:white;font-size:15px;cursor:pointer">🔄</button>
+                        </div>
+                        <div style="position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent)">
+                            <button id="btnShutter" onclick="capturarYAnalizar()" style="width:66px;height:66px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,.35);cursor:pointer;transition:transform .1s"></button>
+                        </div>
+                    </div>
+                    <button onclick="cerrarCamara()" style="width:100%;padding:10px;border-radius:12px;border:1px solid #d0e8cc;background:#f8fcf6;color:#7aaa7a;font-size:13px;cursor:pointer;margin-bottom:10px">Cancelar</button>
+                </div>
+
+                <!-- ESTADO 3: foto tomada + resultado -->
+                <div id="estadoFoto" style="display:none">
+                    <img id="fotoCapturada" style="width:100%;border-radius:16px;margin-bottom:12px" alt="foto"/>
+                    <button onclick="abrirCamara()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid #3da050;background:#f2faf0;color:#3a7a3a;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">📷 Sacar otra foto</button>
+                </div>
+
+                <canvas id="camCanvas" style="display:none"></canvas>
+                <div id="fotoLoading" style="display:none;text-align:center;padding:20px;color:#7aaa7a">
                     <div style="font-size:36px;margin-bottom:8px"><span class="spin">🔍</span></div>
                     <div style="font-size:14px;font-weight:700;color:#3a7a3a">Analizando tu comida...</div>
-                    <div style="font-size:12px;color:#8aaa7a;margin-top:4px">Claude está identificando los alimentos</div>
+                    <div style="font-size:12px;color:#8aaa7a;margin-top:4px">Claude esta identificando los alimentos</div>
                 </div>
                 <div id="fotoError" style="display:none" class="error-box"></div>
                 <div id="fotoResultado" class="foto-resultado">
@@ -204,7 +216,7 @@
                         <span style="font-weight:700;color:#1e3a1e;font-size:13px">Total estimado</span>
                         <span id="fotoTotal" style="font-family:Fraunces,serif;font-size:22px;color:#3a7a3a;font-weight:700"></span>
                     </div>
-                    <button class="foto-agregar-btn" onclick="agregarFotoAlDia()">✅ Agregar todo al registro del día</button>
+                    <button class="foto-agregar-btn" onclick="agregarFotoAlDia()">✅ Agregar todo al registro del dia</button>
                 </div>
             </div>
         </div>
@@ -297,13 +309,11 @@ function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):
 function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 async function abrirCamara(){
-    document.getElementById("btnAbrirCam").style.display="none";
-    document.getElementById("fotoCapturada").style.display="none";
-    document.getElementById("btnNuevaFoto").style.display="none";
+    document.getElementById("estadoInicial").style.display="none";
+    document.getElementById("estadoFoto").style.display="none";
     document.getElementById("fotoResultado").style.display="none";
     document.getElementById("fotoError").style.display="none";
-    const container=document.getElementById("camContainer");
-    container.style.display="block";
+    document.getElementById("estadoCamara").style.display="block";
     try{
         if(camStream) camStream.getTracks().forEach(t=>t.stop());
         camStream=await navigator.mediaDevices.getUserMedia({
@@ -311,47 +321,38 @@ async function abrirCamara(){
         });
         document.getElementById("camVideo").srcObject=camStream;
     }catch(e){
-        container.style.display="none";
-        document.getElementById("btnAbrirCam").style.display="flex";
-        alert("No se pudo acceder a la camara: "+(e.message||"Permiso denegado"));
+        document.getElementById("estadoCamara").style.display="none";
+        document.getElementById("estadoInicial").style.display="block";
+        alert("No se pudo acceder a la camara. Verificá los permisos.");
     }
 }
-
-function nuevaFoto(){
-    document.getElementById("fotoCapturada").style.display="none";
-    document.getElementById("btnNuevaFoto").style.display="none";
-    document.getElementById("fotoResultado").style.display="none";
-    document.getElementById("fotoError").style.display="none";
-    abrirCamara();
+function cerrarCamara(){
+    if(camStream) camStream.getTracks().forEach(t=>t.stop());
+    camStream=null;
+    document.getElementById("estadoCamara").style.display="none";
+    document.getElementById("estadoInicial").style.display="block";
 }
-
 function flipCamara(){
     facingMode=facingMode==="environment"?"user":"environment";
     abrirCamara();
 }
-
 async function capturarYAnalizar(){
     const video=document.getElementById("camVideo");
     const canvas=document.getElementById("camCanvas");
     if(!camStream||!video.videoWidth) return;
-    // Flash
     const flash=document.getElementById("flashOverlay");
-    flash.classList.add("show");
-    setTimeout(()=>flash.classList.remove("show"),180);
-    // Capturar frame
+    flash.style.opacity="0.8";
+    setTimeout(()=>flash.style.opacity="0",180);
     canvas.width=video.videoWidth;
     canvas.height=video.videoHeight;
     canvas.getContext("2d").drawImage(video,0,0);
     const dataURL=canvas.toDataURL("image/jpeg",0.85);
     const base64=dataURL.split(",")[1];
-    // Apagar camara y mostrar foto
     if(camStream) camStream.getTracks().forEach(t=>t.stop());
     camStream=null;
-    document.getElementById("camContainer").style.display="none";
-    const fotoEl=document.getElementById("fotoCapturada");
-    fotoEl.src=dataURL;
-    fotoEl.style.display="block";
-    document.getElementById("btnNuevaFoto").style.display="block";
+    document.getElementById("estadoCamara").style.display="none";
+    document.getElementById("estadoFoto").style.display="block";
+    document.getElementById("fotoCapturada").src=dataURL;
     document.getElementById("fotoLoading").style.display="block";
     document.getElementById("fotoResultado").style.display="none";
     document.getElementById("fotoError").style.display="none";
@@ -374,7 +375,7 @@ async function capturarYAnalizar(){
             const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
             const match=text?.match(/\{[\s\S]*\}/);
             if(!match){
-                document.getElementById("fotoError").textContent="No pude analizar la imagen. Intentá de nuevo.";
+                document.getElementById("fotoError").textContent="No pude analizar la imagen. Intenta de nuevo.";
                 document.getElementById("fotoError").style.display="block";
             }else{
                 const resultado=JSON.parse(match[0]);
@@ -394,7 +395,6 @@ async function capturarYAnalizar(){
     }
     document.getElementById("btnShutter").disabled=false;
 }
-
 function agregarFotoAlDia(){
     if(!fotoItemsDetectados.length) return;
     const nuevos=fotoItemsDetectados.map(f=>({
@@ -405,6 +405,8 @@ function agregarFotoAlDia(){
     persistMeals({...meals,[activeMealFoto]:[...nuevos,...meals[activeMealFoto]]});
     fotoItemsDetectados=[];
     document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("estadoFoto").style.display="none";
+    document.getElementById("estadoInicial").style.display="block";
     setTab("hoy");
 }
 
@@ -460,7 +462,7 @@ function setTab(tab){
         document.getElementById("view-"+t).style.display=t===tab?"block":"none";
         document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
     });
-    // camara se abre manualmente
+    // camara se abre con boton
     if(tab==="semana")renderWeek();
 }
 function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
