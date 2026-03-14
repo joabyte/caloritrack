@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>CaloriTrack</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6fb;
+text-align:center;
+padding:20px;
+}
+
+button{
+padding:14px;
+margin:10px;
+border-radius:12px;
+border:none;
+background:#4CAF50;
+color:white;
+font-size:16px;
+width:200px;
+}
+
+img{
+max-width:90%;
+margin-top:20px;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Analizar comida</h2>
+
+<button id="btnCamera">📷 Foto</button>
+<button id="btnGallery">🖼 Galería</button>
+
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="galleryInput" accept="image/*" style="display:none">
+
+<img id="preview">
+
+<script>
+
+const cameraInput = document.getElementById("cameraInput")
+const galleryInput = document.getElementById("galleryInput")
+
+const btnCamera = document.getElementById("btnCamera")
+const btnGallery = document.getElementById("btnGallery")
+
+const preview = document.getElementById("preview")
+
+btnCamera.onclick = ()=>{
+
+cameraInput.value=""
+cameraInput.click()
+
+}
+
+btnGallery.onclick = ()=>{
+
+galleryInput.value=""
+galleryInput.click()
+
+}
+
+cameraInput.addEventListener("change",(e)=>{
+
+if(!e.target.files.length)return
+
+const file=e.target.files[0]
+
+procesar(file)
+
+})
+
+galleryInput.addEventListener("change",(e)=>{
+
+if(!e.target.files.length)return
+
+const file=e.target.files[0]
+
+procesar(file)
+
+})
+
+function procesar(file){
+
+const reader=new FileReader()
+
+reader.onload=function(e){
+
+preview.src=e.target.result
+analizar(e.target.result)
+
+}
+
+reader.readAsDataURL(file)
+
+}
+
+function analizar(img){
+
+console.log("imagen lista para analizar")
+
+}
+
+</script>
+
+</body>
+</html>
