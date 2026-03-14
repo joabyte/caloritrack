@@ -80,20 +80,19 @@
         .history-day { margin-bottom: 12px; padding: 14px 16px; border-radius: 18px; border: 1px solid #e4eee0; background: #f8fcf7; }
         .history-day.today { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border-color: #b8e0b0; }
         .footer { text-align: center; margin-top: 22px; font-size: 11px; color: #a8c4a0; padding-bottom: 20px; }
-
-        /* ── CÁMARA EN VIVO ── */
+        /* CAMARA */
         .cam-container { border-radius: 16px; overflow: hidden; background: #000; position: relative; width: 100%; aspect-ratio: 4/3; margin-bottom: 12px; }
         #camVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .cam-overlay { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: linear-gradient(to bottom, rgba(0,0,0,.5), transparent); }
+        .cam-overlay-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: linear-gradient(to bottom, rgba(0,0,0,.5), transparent); }
         .cam-badge { font-size: 10px; color: #c8f135; background: rgba(200,241,53,0.15); border: 1px solid rgba(200,241,53,0.3); border-radius: 4px; padding: 3px 8px; font-weight: 700; letter-spacing: 1px; }
         #btnFlip { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 50%; width: 34px; height: 34px; color: white; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .cam-controls-row { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,.6), transparent); }
+        .cam-shutter-row { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,.6), transparent); }
         #btnShutter { width: 62px; height: 62px; border-radius: 50%; background: white; border: 4px solid rgba(255,255,255,.35); cursor: pointer; transition: transform .1s; }
         #btnShutter:active { transform: scale(.88); }
-        #flashOverlay { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .05s; border-radius: 16px; }
+        #flashOverlay { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .05s; }
         #flashOverlay.show { opacity: 0.8; }
-        #noCamMsg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: #8aaa7a; background: #f0f8ee; border-radius: 16px; padding: 20px; text-align: center; }
-        #btnActivarCam { padding: 12px 24px; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 6px; }
+        #noCamMsg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: #8aaa7a; background: #f0f8ee; padding: 20px; text-align: center; }
+        #btnActivarCam { padding: 12px 24px; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
         .foto-resultado { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; display: none; animation: fadeSlide 0.3s ease; }
         .foto-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #d8eed4; font-size: 12px; color: #3a5a3a; }
         .foto-item:last-child { border-bottom: none; }
@@ -140,7 +139,6 @@
             <button class="tab-btn" id="tab-semana" onclick="setTab('semana')">📊 Semana</button>
         </div>
 
-        <!-- TAB HOY -->
         <div id="view-hoy">
             <div class="card">
                 <div class="card-title">✦ Agregar con IA</div>
@@ -168,15 +166,12 @@
             </div>
         </div>
 
-        <!-- TAB FOTO CON CÁMARA EN VIVO -->
         <div id="view-foto" style="display:none">
             <div class="card">
-                <div class="card-title">📷 Sacá una foto a tu comida</div>
+                <div class="card-title">📷 Foto de tu comida</div>
                 <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">La IA detecta los alimentos y calcula las calorías automáticamente.</div>
                 <div class="meal-btns" id="mealBtnsFoto"></div>
-
-                <!-- Cámara en vivo -->
-                <div class="cam-container" id="camContainer">
+                <div class="cam-container">
                     <div id="noCamMsg">
                         <div style="font-size:40px">📷</div>
                         <div>Necesita acceso a la cámara</div>
@@ -185,25 +180,21 @@
                     </div>
                     <video id="camVideo" autoplay playsinline muted style="display:none"></video>
                     <div id="flashOverlay"></div>
-                    <div class="cam-overlay" id="camOverlay" style="display:none">
+                    <div class="cam-overlay-bar" id="camOverlayBar" style="display:none">
                         <span class="cam-badge" id="camBadge">EN VIVO</span>
                         <button id="btnFlip" onclick="flipCamara()">🔄</button>
                     </div>
-                    <div class="cam-controls-row" id="camControlsRow" style="display:none">
+                    <div class="cam-shutter-row" id="camShutterRow" style="display:none">
                         <button id="btnShutter" onclick="capturarYAnalizar()"></button>
                     </div>
                 </div>
                 <canvas id="camCanvas"></canvas>
-
-                <!-- Loading -->
                 <div id="fotoLoading" class="foto-loading">
                     <div style="font-size:36px;margin-bottom:8px"><span class="spin">🔍</span></div>
                     <div style="font-size:14px;font-weight:700;color:#3a7a3a">Analizando tu comida...</div>
                     <div style="font-size:12px;color:#8aaa7a;margin-top:4px">Claude está identificando los alimentos</div>
                 </div>
                 <div id="fotoError" style="display:none" class="error-box"></div>
-
-                <!-- Resultado -->
                 <div id="fotoResultado" class="foto-resultado">
                     <div style="font-size:11px;color:#7aaa7a;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">✦ Alimentos detectados</div>
                     <div id="fotoItems"></div>
@@ -216,7 +207,6 @@
             </div>
         </div>
 
-        <!-- TAB SEMANA -->
         <div id="view-semana" style="display:none">
             <div class="card">
                 <div class="card-title">✦ Semana de calorías</div>
@@ -229,7 +219,6 @@
     </div>
 </div>
 
-<!-- MODAL PERFIL -->
 <div class="modal-overlay" id="profileModal" style="display:none" onclick="closeProfile()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -268,7 +257,6 @@
     </div>
 </div>
 
-<!-- MODAL HISTORIAL -->
 <div class="modal-overlay" id="historyModal" style="display:none" onclick="closeHistory()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -287,219 +275,184 @@ const SYSTEM_PROMPT = `Eres nutricionista experto. El usuario describe un alimen
 const ADVICE_PROMPT = `Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
 const PHOTO_PROMPT = `Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
 const MEALS = [
-    {key:"desayuno", label:"Desayuno", emoji:"🌅", color:"#f0c050"},
-    {key:"almuerzo", label:"Almuerzo", emoji:"☀️", color:"#52c478"},
-    {key:"merienda", label:"Merienda", emoji:"🍵", color:"#f0a050"},
-    {key:"cena",     label:"Cena",     emoji:"🌙", color:"#7890f0"}
+    {key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},
+    {key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},
+    {key:"merienda",label:"Merienda",emoji:"🍵",color:"#f0a050"},
+    {key:"cena",label:"Cena",emoji:"🌙",color:"#7890f0"}
 ];
 const QUICK = ["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
-const ACTS = {sedentario:1.2, ligero:1.375, moderado:1.55, activo:1.725};
-const OBJS = {bajar:0.8, mantener:1.0, subir:1.2};
-let activeMeal = "desayuno", activeMealFoto = "almuerzo", currentObj = "mantener";
-let meals = loadLS("ct:meals:" + todayKey(), {desayuno:[], almuerzo:[], merienda:[], cena:[]});
-let profile = loadLS("ct:profile", {});
-let history = loadLS("ct:history", {});
-let fotoItemsDetectados = [];
+const ACTS = {sedentario:1.2,ligero:1.375,moderado:1.55,activo:1.725};
+const OBJS = {bajar:0.8,mantener:1.0,subir:1.2};
+let activeMeal="desayuno", activeMealFoto="almuerzo", currentObj="mantener";
+let meals=loadLS("ct:meals:"+todayKey(),{desayuno:[],almuerzo:[],merienda:[],cena:[]});
+let profile=loadLS("ct:profile",{});
+let history=loadLS("ct:history",{});
+let fotoItemsDetectados=[];
+let camStream=null, facingMode="environment";
 
-// ── CÁMARA ──
-let camStream = null;
-let facingMode = "environment";
+function todayKey(){return new Date().toISOString().split("T")[0];}
+function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-async function activarCamara() {
-    const errEl = document.getElementById("camError");
-    errEl.style.display = "none";
-    document.getElementById("btnActivarCam").textContent = "Iniciando...";
-    try {
-        if (camStream) camStream.getTracks().forEach(t => t.stop());
-        camStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } },
-            audio: false
+async function activarCamara(){
+    const errEl=document.getElementById("camError");
+    errEl.style.display="none";
+    document.getElementById("btnActivarCam").textContent="Iniciando...";
+    try{
+        if(camStream) camStream.getTracks().forEach(t=>t.stop());
+        camStream=await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:{ideal:facingMode},width:{ideal:1280},height:{ideal:720}},audio:false
         });
-        const video = document.getElementById("camVideo");
-        video.srcObject = camStream;
-        video.style.display = "block";
-        document.getElementById("noCamMsg").style.display = "none";
-        document.getElementById("camOverlay").style.display = "flex";
-        document.getElementById("camControlsRow").style.display = "flex";
-    } catch(e) {
-        document.getElementById("btnActivarCam").textContent = "REINTENTAR";
-        errEl.textContent = "No se pudo acceder: " + (e.message || "Permiso denegado");
-        errEl.style.display = "block";
+        const video=document.getElementById("camVideo");
+        video.srcObject=camStream;
+        video.style.display="block";
+        document.getElementById("noCamMsg").style.display="none";
+        document.getElementById("camOverlayBar").style.display="flex";
+        document.getElementById("camShutterRow").style.display="flex";
+    }catch(e){
+        document.getElementById("btnActivarCam").textContent="REINTENTAR";
+        errEl.textContent="No se pudo acceder: "+(e.message||"Permiso denegado");
+        errEl.style.display="block";
     }
 }
 
-function flipCamara() {
-    facingMode = facingMode === "environment" ? "user" : "environment";
+function flipCamara(){
+    facingMode=facingMode==="environment"?"user":"environment";
     activarCamara();
 }
 
-async function capturarYAnalizar() {
-    const video = document.getElementById("camVideo");
-    const canvas = document.getElementById("camCanvas");
-    if (!camStream || !video.videoWidth) return;
-
-    // Flash visual
-    const flash = document.getElementById("flashOverlay");
+async function capturarYAnalizar(){
+    const video=document.getElementById("camVideo");
+    const canvas=document.getElementById("camCanvas");
+    if(!camStream||!video.videoWidth) return;
+    const flash=document.getElementById("flashOverlay");
     flash.classList.add("show");
-    setTimeout(() => flash.classList.remove("show"), 180);
-
-    // Capturar frame
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0);
-    const base64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
-
-    // Mostrar loading
-    document.getElementById("fotoLoading").style.display = "block";
-    document.getElementById("fotoResultado").style.display = "none";
-    document.getElementById("fotoError").style.display = "none";
-    document.getElementById("btnShutter").disabled = true;
-    document.getElementById("camBadge").textContent = "ANALIZANDO...";
-
-    try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-                "anthropic-version": "2023-06-01",
-                "anthropic-dangerous-direct-browser-access": "true"
-            },
-            body: JSON.stringify({
-                model: MODEL, max_tokens: 1000,
-                messages: [{role:"user", content:[
-                    {type:"image", source:{type:"base64", media_type:"image/jpeg", data:base64}},
-                    {type:"text", text:PHOTO_PROMPT}
-                ]}]
-            })
+    setTimeout(()=>flash.classList.remove("show"),180);
+    canvas.width=video.videoWidth;
+    canvas.height=video.videoHeight;
+    canvas.getContext("2d").drawImage(video,0,0);
+    const base64=canvas.toDataURL("image/jpeg",0.85).split(",")[1];
+    document.getElementById("fotoLoading").style.display="block";
+    document.getElementById("fotoResultado").style.display="none";
+    document.getElementById("fotoError").style.display="none";
+    document.getElementById("btnShutter").disabled=true;
+    document.getElementById("camBadge").textContent="ANALIZANDO...";
+    try{
+        const res=await fetch("https://api.anthropic.com/v1/messages",{
+            method:"POST",
+            headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+            body:JSON.stringify({model:MODEL,max_tokens:1000,messages:[{role:"user",content:[
+                {type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64}},
+                {type:"text",text:PHOTO_PROMPT}
+            ]}]})
         });
-        const data = await res.json();
-        document.getElementById("fotoLoading").style.display = "none";
-
-        if (data.error) {
-            document.getElementById("fotoError").textContent = "Error: " + data.error.message;
-            document.getElementById("fotoError").style.display = "block";
-        } else {
-            const text = data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
-            const match = text?.match(/\{[\s\S]*\}/);
-            if (!match) {
-                document.getElementById("fotoError").textContent = "No pude analizar la imagen. Intentá de nuevo.";
-                document.getElementById("fotoError").style.display = "block";
-            } else {
-                const resultado = JSON.parse(match[0]);
-                fotoItemsDetectados = resultado.items || [];
-                const total = fotoItemsDetectados.reduce((a,f) => a + f.calories, 0);
-                document.getElementById("fotoItems").innerHTML = fotoItemsDetectados.map(f => `
-                    <div class="foto-item">
-                        <span>${f.emoji} <strong>${f.name}</strong> <span style="color:#9ab89a;font-size:10px">(${f.portion})</span></span>
-                        <span class="foto-item-cal">${f.calories} kcal</span>
-                    </div>
-                `).join("");
-                document.getElementById("fotoTotal").textContent = Math.round(total) + " kcal";
-                document.getElementById("fotoResultado").style.display = "block";
+        const data=await res.json();
+        document.getElementById("fotoLoading").style.display="none";
+        if(data.error){
+            document.getElementById("fotoError").textContent="Error: "+data.error.message;
+            document.getElementById("fotoError").style.display="block";
+        }else{
+            const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+            const match=text?.match(/\{[\s\S]*\}/);
+            if(!match){
+                document.getElementById("fotoError").textContent="No pude analizar la imagen. Intentá de nuevo.";
+                document.getElementById("fotoError").style.display="block";
+            }else{
+                const resultado=JSON.parse(match[0]);
+                fotoItemsDetectados=resultado.items||[];
+                const total=fotoItemsDetectados.reduce((a,f)=>a+f.calories,0);
+                document.getElementById("fotoItems").innerHTML=fotoItemsDetectados.map(f=>
+                    `<div class="foto-item"><span>${f.emoji} <strong>${f.name}</strong> <span style="color:#9ab89a;font-size:10px">(${f.portion})</span></span><span class="foto-item-cal">${f.calories} kcal</span></div>`
+                ).join("");
+                document.getElementById("fotoTotal").textContent=Math.round(total)+" kcal";
+                document.getElementById("fotoResultado").style.display="block";
             }
         }
-    } catch(e) {
-        document.getElementById("fotoLoading").style.display = "none";
-        document.getElementById("fotoError").textContent = "Error al analizar: " + e.message;
-        document.getElementById("fotoError").style.display = "block";
+    }catch(e){
+        document.getElementById("fotoLoading").style.display="none";
+        document.getElementById("fotoError").textContent="Error: "+e.message;
+        document.getElementById("fotoError").style.display="block";
     }
-
-    document.getElementById("btnShutter").disabled = false;
-    document.getElementById("camBadge").textContent = "EN VIVO";
+    document.getElementById("btnShutter").disabled=false;
+    document.getElementById("camBadge").textContent="EN VIVO";
 }
 
-function agregarFotoAlDia() {
-    if (!fotoItemsDetectados.length) return;
-    const nuevos = fotoItemsDetectados.map(f => ({
-        id: Date.now() + Math.random(),
-        name: f.name, emoji: f.emoji,
-        calories: Number(f.calories)||0, protein: Number(f.protein)||0,
-        carbs: Number(f.carbs)||0, fat: Number(f.fat)||0,
-        fiber: Number(f.fiber)||0, portion: f.portion||"1 porcion"
+function agregarFotoAlDia(){
+    if(!fotoItemsDetectados.length) return;
+    const nuevos=fotoItemsDetectados.map(f=>({
+        id:Date.now()+Math.random(),name:f.name,emoji:f.emoji,
+        calories:Number(f.calories)||0,protein:Number(f.protein)||0,
+        carbs:Number(f.carbs)||0,fat:Number(f.fat)||0,fiber:Number(f.fiber)||0,portion:f.portion||"1 porcion"
     }));
-    persistMeals({...meals, [activeMealFoto]: [...nuevos, ...meals[activeMealFoto]]});
-    fotoItemsDetectados = [];
-    document.getElementById("fotoResultado").style.display = "none";
+    persistMeals({...meals,[activeMealFoto]:[...nuevos,...meals[activeMealFoto]]});
+    fotoItemsDetectados=[];
+    document.getElementById("fotoResultado").style.display="none";
     setTab("hoy");
 }
 
-// ── CORE ──
-function todayKey() { return new Date().toISOString().split("T")[0]; }
-function loadLS(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
-function saveLS(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-function calcGoals(p) {
-    const w = Number(p.weight)||70, h = Number(p.height)||170, a = Number(p.age)||25;
-    const bmr = p.sex === "F" ? 10*w + 6.25*h - 5*a - 161 : 10*w + 6.25*h - 5*a + 5;
-    const cal = Math.round(bmr * (ACTS[p.activity]||1.55) * (OBJS[p.objective]||1));
-    return {calories:cal, protein:Math.round(w*1.8), carbs:Math.round(cal*0.45/4), fat:Math.round(cal*0.25/9), fiber:30};
+function calcGoals(p){
+    const w=Number(p.weight)||70,h=Number(p.height)||170,a=Number(p.age)||25;
+    const bmr=p.sex==="F"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
+    const cal=Math.round(bmr*(ACTS[p.activity]||1.55)*(OBJS[p.objective]||1));
+    return{calories:cal,protein:Math.round(w*1.8),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:30};
 }
-function getGoals() { return profile.weight ? calcGoals(profile) : {calories:2000, protein:150, carbs:250, fat:65, fiber:30}; }
-function getAllFoods() { return Object.values(meals).flat(); }
-function getTotals() {
-    return getAllFoods().reduce((a,f) => ({
-        calories: a.calories+f.calories, protein: a.protein+f.protein,
-        carbs: a.carbs+f.carbs, fat: a.fat+f.fat, fiber: a.fiber+f.fiber
-    }), {calories:0,protein:0,carbs:0,fat:0,fiber:0});
+function getGoals(){return profile.weight?calcGoals(profile):{calories:2000,protein:150,carbs:250,fat:65,fiber:30};}
+function getAllFoods(){return Object.values(meals).flat();}
+function getTotals(){return getAllFoods().reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat,fiber:a.fiber+f.fiber}),{calories:0,protein:0,carbs:0,fat:0,fiber:0});}
+function persistMeals(upd){
+    meals=upd;const t=todayKey();history[t]=upd;
+    saveLS("ct:meals:"+t,upd);saveLS("ct:history",history);render();
 }
-function persistMeals(upd) {
-    meals = upd;
-    const t = todayKey();
-    history[t] = upd;
-    saveLS("ct:meals:" + t, upd);
-    saveLS("ct:history", history);
-    render();
-}
-function render() {
-    document.getElementById("todayDate").textContent = new Date().toLocaleDateString("es-AR", {weekday:"long",day:"numeric",month:"long"});
-    const g = getGoals(), t = getTotals();
-    const circ = 289.03, pct = Math.min(t.calories/g.calories,1);
-    const color = t.calories>g.calories?"#e8806a":t.calories>g.calories*0.8?"#f0b84a":"#52b86a";
-    document.getElementById("ringArc").setAttribute("stroke-dashoffset", circ*(1-pct));
-    document.getElementById("ringArc").setAttribute("stroke", color);
-    document.getElementById("ringVal").textContent = Math.round(t.calories);
-    const rem = g.calories - t.calories;
-    const box = document.getElementById("remainingBox"), txt = document.getElementById("remainingText");
-    if (rem>=0) { box.style.background="#f0fced"; box.style.border="1px solid #c8e8c0"; txt.style.color="#3a7a3a"; txt.textContent=Math.round(rem)+" kcal libres"; }
-    else { box.style.background="#fff0ec"; box.style.border="1px solid #f0c8b8"; txt.style.color="#c05a3a"; txt.textContent=Math.abs(Math.round(rem))+" kcal de mas"; }
-    document.getElementById("macroBars").innerHTML = [["Proteina",t.protein,g.protein,"#52c478"],["Carbohidratos",t.carbs,g.carbs,"#f0c050"],["Grasas",t.fat,g.fat,"#f07a5a"],["Fibra",t.fiber,g.fiber,"#78c0f0"]].map(([l,v,m,c]) => `<div class="macro-row"><span style="font-weight:600">${l}</span><span>${Math.round(v)}/${m}g</span></div><div class="macro-bg"><div class="macro-fill" style="width:${Math.min(v/m*100,100)}%;background:${c}"></div></div>`).join("");
-    document.getElementById("mealBtns").innerHTML = MEALS.map(m => `<button class="meal-btn${activeMeal===m.key?" active":""}" style="${activeMeal===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMeal('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
-    document.getElementById("mealBtnsFoto").innerHTML = MEALS.map(m => `<button class="meal-btn${activeMealFoto===m.key?" active":""}" style="${activeMealFoto===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMealFoto('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
-    document.getElementById("searchInput").placeholder = "Agregar a " + MEALS.find(m=>m.key===activeMeal).label.toLowerCase() + "...";
-    document.getElementById("quickBtns").innerHTML = QUICK.map(s => `<button class="quick-btn" onclick="quickSearch('${s}')">${s}</button>`).join("");
-    let html = "";
-    MEALS.forEach(meal => {
-        const mf = meals[meal.key]; if (!mf.length) return;
-        const mc = mf.reduce((a,f)=>a+f.calories,0);
-        html += `<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:16px">${meal.emoji}</span><span style="font-weight:700;color:#1e3a1e;font-size:13px">${meal.label}</span><span style="font-size:11px;color:#9ab89a;margin-left:auto">${Math.round(mc)} kcal</span></div>`;
-        mf.forEach(f => { html += `<div class="food-card"><span class="food-emoji">${f.emoji}</span><div style="flex:1;min-width:0"><div class="food-name">${f.name}</div><div class="food-portion">${f.portion}</div></div><div style="display:flex;align-items:center;flex-shrink:0"><div class="food-macro"><div class="food-macro-val" style="color:#5aba72">${Math.round(f.protein)}</div><div class="food-macro-lbl">P</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f0b84a">${Math.round(f.carbs)}</div><div class="food-macro-lbl">C</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f07a5a">${Math.round(f.fat)}</div><div class="food-macro-lbl">G</div></div><div style="text-align:center;margin:0 4px"><div class="food-cal">${f.calories}</div><div class="food-cal-lbl">kcal</div></div><button class="remove-btn" onclick="removeFood('${meal.key}',${f.id})">✕</button></div></div>`; });
-        html += "</div>";
+function render(){
+    document.getElementById("todayDate").textContent=new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+    const g=getGoals(),t=getTotals();
+    const circ=289.03,pct=Math.min(t.calories/g.calories,1);
+    const color=t.calories>g.calories?"#e8806a":t.calories>g.calories*0.8?"#f0b84a":"#52b86a";
+    document.getElementById("ringArc").setAttribute("stroke-dashoffset",circ*(1-pct));
+    document.getElementById("ringArc").setAttribute("stroke",color);
+    document.getElementById("ringVal").textContent=Math.round(t.calories);
+    const rem=g.calories-t.calories;
+    const box=document.getElementById("remainingBox"),txt=document.getElementById("remainingText");
+    if(rem>=0){box.style.background="#f0fced";box.style.border="1px solid #c8e8c0";txt.style.color="#3a7a3a";txt.textContent=Math.round(rem)+" kcal libres";}
+    else{box.style.background="#fff0ec";box.style.border="1px solid #f0c8b8";txt.style.color="#c05a3a";txt.textContent=Math.abs(Math.round(rem))+" kcal de mas";}
+    document.getElementById("macroBars").innerHTML=[["Proteina",t.protein,g.protein,"#52c478"],["Carbohidratos",t.carbs,g.carbs,"#f0c050"],["Grasas",t.fat,g.fat,"#f07a5a"],["Fibra",t.fiber,g.fiber,"#78c0f0"]].map(([l,v,m,c])=>`<div class="macro-row"><span style="font-weight:600">${l}</span><span>${Math.round(v)}/${m}g</span></div><div class="macro-bg"><div class="macro-fill" style="width:${Math.min(v/m*100,100)}%;background:${c}"></div></div>`).join("");
+    document.getElementById("mealBtns").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMeal===m.key?" active":""}" style="${activeMeal===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMeal('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("mealBtnsFoto").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMealFoto===m.key?" active":""}" style="${activeMealFoto===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMealFoto('${m.key}')">${m.emoji}<div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("searchInput").placeholder="Agregar a "+MEALS.find(m=>m.key===activeMeal).label.toLowerCase()+"...";
+    document.getElementById("quickBtns").innerHTML=QUICK.map(s=>`<button class="quick-btn" onclick="quickSearch('${s}')">${s}</button>`).join("");
+    let html="";
+    MEALS.forEach(meal=>{
+        const mf=meals[meal.key];if(!mf.length)return;
+        const mc=mf.reduce((a,f)=>a+f.calories,0);
+        html+=`<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:16px">${meal.emoji}</span><span style="font-weight:700;color:#1e3a1e;font-size:13px">${meal.label}</span><span style="font-size:11px;color:#9ab89a;margin-left:auto">${Math.round(mc)} kcal</span></div>`;
+        mf.forEach(f=>{html+=`<div class="food-card"><span class="food-emoji">${f.emoji}</span><div style="flex:1;min-width:0"><div class="food-name">${f.name}</div><div class="food-portion">${f.portion}</div></div><div style="display:flex;align-items:center;flex-shrink:0"><div class="food-macro"><div class="food-macro-val" style="color:#5aba72">${Math.round(f.protein)}</div><div class="food-macro-lbl">P</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f0b84a">${Math.round(f.carbs)}</div><div class="food-macro-lbl">C</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f07a5a">${Math.round(f.fat)}</div><div class="food-macro-lbl">G</div></div><div style="text-align:center;margin:0 4px"><div class="food-cal">${f.calories}</div><div class="food-cal-lbl">kcal</div></div><button class="remove-btn" onclick="removeFood('${meal.key}',${f.id})">✕</button></div></div>`;});
+        html+="</div>";
     });
-    if (!getAllFoods().length) html = `<div class="empty-state"><div style="font-size:44px;margin-bottom:12px">🥗</div><div style="font-size:16px;color:#90b080;margin-bottom:6px">Tu plato esta vacio</div><div style="font-size:12px">Selecciona una comida y describí qué comiste</div></div>`;
-    document.getElementById("foodList").innerHTML = html;
-    document.getElementById("adviceCard").style.display = getAllFoods().length ? "block" : "none";
-    const dias = Object.keys(history).filter(d=>d!==todayKey()).length;
-    document.getElementById("historyCount").textContent = dias>0?dias+"d":"Historial";
-    if (document.getElementById("view-semana").style.display!=="none") renderWeek();
+    if(!getAllFoods().length)html=`<div class="empty-state"><div style="font-size:44px;margin-bottom:12px">🥗</div><div style="font-size:16px;color:#90b080;margin-bottom:6px">Tu plato esta vacio</div><div style="font-size:12px">Selecciona una comida y describí qué comiste</div></div>`;
+    document.getElementById("foodList").innerHTML=html;
+    document.getElementById("adviceCard").style.display=getAllFoods().length?"block":"none";
+    const dias=Object.keys(history).filter(d=>d!==todayKey()).length;
+    document.getElementById("historyCount").textContent=dias>0?dias+"d":"Historial";
+    if(document.getElementById("view-semana").style.display!=="none")renderWeek();
 }
-function setMeal(key) { activeMeal=key; render(); }
-function setMealFoto(key) { activeMealFoto=key; render(); }
-function setTab(tab) {
-    ["hoy","foto","semana"].forEach(t => {
-        document.getElementById("view-"+t).style.display = t===tab?"block":"none";
-        document.getElementById("tab-"+t).className = "tab-btn"+(t===tab?" active":"");
+function setMeal(key){activeMeal=key;render();}
+function setMealFoto(key){activeMealFoto=key;render();}
+function setTab(tab){
+    ["hoy","foto","semana"].forEach(t=>{
+        document.getElementById("view-"+t).style.display=t===tab?"block":"none";
+        document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
     });
-    if (tab==="foto" && !camStream) activarCamara();
-    if (tab==="semana") renderWeek();
+    if(tab==="foto"&&!camStream)activarCamara();
+    if(tab==="semana")renderWeek();
 }
-function setError(msg) { const box=document.getElementById("errorBox"); if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none"; }
-function quickSearch(s) { const q=s.replace(/^\S+\s/,""); document.getElementById("searchInput").value=q; doSearch(); }
-async function doSearch() {
+function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
+function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
+async function doSearch(){
     const input=document.getElementById("searchInput");
-    const q=input.value.trim(); if(!q) return;
+    const q=input.value.trim();if(!q)return;
     const btn=document.getElementById("searchBtn");
-    btn.disabled=true; btn.innerHTML='<span class="spin">⟳</span>'; setError("");
-    try {
+    btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span>';setError("");
+    try{
         const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:400,system:SYSTEM_PROMPT,messages:[{role:"user",content:q}]})});
         const data=await res.json();
         if(data.error){setError("Error: "+data.error.message);btn.disabled=false;btn.innerHTML="↑";return;}
@@ -510,18 +463,18 @@ async function doSearch() {
         if(parsed.error){setError("No reconoci ese alimento 🌿");btn.disabled=false;btn.innerHTML="↑";return;}
         const food={id:Date.now(),name:parsed.name||q,emoji:parsed.emoji||"🍽️",calories:Number(parsed.calories)||0,protein:Number(parsed.protein)||0,carbs:Number(parsed.carbs)||0,fat:Number(parsed.fat)||0,fiber:Number(parsed.fiber)||0,portion:parsed.portion||"1 porcion"};
         persistMeals({...meals,[activeMeal]:[food,...meals[activeMeal]]});
-        input.value=""; input.focus();
-    } catch(e){setError("Error: "+e.message);}
-    btn.disabled=false; btn.innerHTML="↑";
+        input.value="";input.focus();
+    }catch(e){setError("Error: "+e.message);}
+    btn.disabled=false;btn.innerHTML="↑";
 }
-function removeFood(mk,id) { persistMeals({...meals,[mk]:meals[mk].filter(f=>f.id!=id)}); }
-function clearAll() { persistMeals({desayuno:[],almuerzo:[],merienda:[],cena:[]}); }
-async function getAdvice() {
-    const foods=getAllFoods(); if(!foods.length) return;
-    const btn=document.getElementById("adviceBtn"); btn.textContent="..."; btn.disabled=true;
+function removeFood(mk,id){persistMeals({...meals,[mk]:meals[mk].filter(f=>f.id!=id)});}
+function clearAll(){persistMeals({desayuno:[],almuerzo:[],merienda:[],cena:[]});}
+async function getAdvice(){
+    const foods=getAllFoods();if(!foods.length)return;
+    const btn=document.getElementById("adviceBtn");btn.textContent="...";btn.disabled=true;
     const t=getTotals(),g=getGoals();
     const summary=`Calorias:${Math.round(t.calories)}/${g.calories}kcal Proteina:${Math.round(t.protein)}g Carbos:${Math.round(t.carbs)}g Grasas:${Math.round(t.fat)}g Fibra:${Math.round(t.fiber)}g Alimentos:${foods.map(f=>f.name).join(",")}`;
-    try {
+    try{
         const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:500,system:ADVICE_PROMPT,messages:[{role:"user",content:summary}]})});
         const data=await res.json();
         const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
@@ -530,7 +483,7 @@ async function getAdvice() {
         const a=JSON.parse(match[0]);
         document.getElementById("adviceContent").innerHTML=`<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#ecf8e8;border:1px solid #cce8c4;margin-bottom:12px"><div style="font-size:32px">${a.emoji}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:22px;color:#3a7a3a;font-weight:700;font-family:Fraunces,serif">${a.score}</span><span style="font-size:11px;color:#7aaa7a">/10</span><div style="flex:1;height:6px;border-radius:99px;background:#d8eed4;margin-left:4px"><div style="height:100%;width:${a.score*10}%;border-radius:99px;background:${a.score>=7?"#52c478":a.score>=5?"#f0c050":"#f07a5a"}"></div></div></div><div style="font-size:12px;color:#3a5a3a;font-weight:500">${a.summary}</div></div></div><div style="padding:10px 14px;border-radius:14px;background:#f8fff6;border:1px solid #d8eed4;margin-bottom:8px"><div style="font-size:11px;color:#52a062;font-weight:700">💚 ${a.highlight}</div></div><div style="font-size:11px;color:#5a7a5a;font-weight:700;margin-bottom:6px">SUGERENCIAS</div>${a.tips.map((tip,i)=>`<div style="display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:#3a5a3a;line-height:1.4"><span style="color:#7acd8a;font-weight:700;flex-shrink:0">${i+1}.</span>${tip}</div>`).join("")}</div>`;
         btn.textContent="Actualizar";
-    } catch(e){btn.textContent="Analizar mi dia";}
+    }catch(e){btn.textContent="Analizar mi dia";}
     btn.disabled=false;
 }
 function setObj(key){currentObj=key;document.querySelectorAll(".obj-btn").forEach((b,i)=>{b.className="obj-btn"+(["bajar","mantener","subir"][i]===key?" active":"");});updateGoalsPreview();}
@@ -558,7 +511,7 @@ function saveProfile(){
 }
 function openHistory(){
     const days=Object.keys(history).sort((a,b)=>b.localeCompare(a)).slice(0,14);
-    const g=getGoals(); let html="";
+    const g=getGoals();let html="";
     if(!days.length){html=`<div style="text-align:center;padding:40px 0"><div style="font-size:40px">📭</div><div style="font-size:16px;color:#90b080;margin-top:10px">Sin historial aun</div></div>`;}
     else days.forEach(day=>{
         const af=Object.values(history[day]||{}).flat();
