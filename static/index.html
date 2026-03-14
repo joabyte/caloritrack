@@ -10,94 +10,87 @@
     <title>CaloriTrack</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#eaf5e6,#f4fbf0,#e8f5e2);min-height:100vh}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#b8d8b0;border-radius:99px}
-        @keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .spin{display:inline-block;animation:spin 0.8s linear infinite}
-        .wrap{max-width:430px;margin:0 auto;padding-bottom:60px}
-        .header{padding:28px 20px 20px;background:linear-gradient(180deg,#dff2d8,transparent);border-bottom:1px solid #d4eed0}
-        .header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
-        .header-title{font-family:'Fraunces',serif;font-size:24px;color:#1a3a1a;font-weight:700}
-        .header-sub{font-size:12px;color:#7aaa7a;margin-top:4px;text-transform:capitalize}
-        .header-label{font-size:11px;letter-spacing:3px;color:#5a9a5a;font-weight:700;text-transform:uppercase;margin-bottom:4px}
-        .btn-header{background:white;border:1px solid #d0e8cc;border-radius:12px;padding:7px 11px;font-size:11px;color:#4a7a4a;cursor:pointer;font-weight:600}
-        .btn-header.active{background:linear-gradient(135deg,#5fc96e,#3da050);border-color:#3da050;color:white}
-        .card{background:white;border-radius:20px;padding:16px;box-shadow:0 3px 18px rgba(50,100,50,.07);margin-bottom:14px}
-        .card-title{font-size:11px;color:#7aaa7a;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-        .ring-wrap{background:white;border-radius:24px;padding:18px 20px;box-shadow:0 6px 30px rgba(50,100,50,.09);display:flex;align-items:center;gap:18px}
-        .macro-row{display:flex;justify-content:space-between;font-size:11px;color:#6b876b;margin-bottom:3px}
-        .macro-bg{height:6px;border-radius:99px;background:#e4f0e0;margin-bottom:8px}
-        .macro-fill{height:100%;border-radius:99px;transition:width 0.7s}
-        .remaining{padding:7px 12px;border-radius:12px;margin-bottom:12px;font-size:14px;font-weight:700}
-        .tabs{display:flex;gap:6px;background:white;border-radius:14px;padding:4px;box-shadow:0 2px 10px rgba(50,100,50,.06);margin-bottom:14px}
-        .tab-btn{flex:1;padding:9px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#7aaa7a}
-        .tab-btn.active{background:linear-gradient(135deg,#5fc96e,#3da050);color:white}
-        .meal-btns{display:flex;gap:6px;margin-bottom:12px}
-        .meal-btn{flex:1;padding:7px 2px;border-radius:10px;border:1.5px solid #dceeda;font-size:11px;font-weight:700;cursor:pointer;background:#f8fcf6;color:#6b876b;text-align:center}
-        .search-row{display:flex;gap:8px;margin-bottom:10px}
-        .search-input{flex:1;border:1.5px solid #dceeda;border-radius:14px;padding:11px 14px;font-size:14px;color:#1e3a1e;background:#f8fcf6;outline:none}
-        .search-input:focus{border-color:#6abf7a}
-        .search-btn{width:46px;height:46px;border-radius:14px;border:none;background:linear-gradient(135deg,#5fc96e,#3da050);color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-        .search-btn:disabled{background:#c8e4c4;cursor:default}
-        .quick-btns{display:flex;flex-wrap:wrap;gap:6px}
-        .quick-btn{background:#f2faf0;border:1px solid #d0e8cc;border-radius:99px;padding:5px 11px;font-size:12px;color:#4a7a4a;cursor:pointer;font-weight:500}
-        .error-box{font-size:12px;color:#c06050;background:#fff5f3;border:1px solid #f0d0c8;border-radius:10px;padding:8px 12px;margin-bottom:10px}
-        .food-card{display:flex;align-items:center;padding:10px 12px;margin-bottom:6px;border-radius:14px;background:#f5fcf3;border:1px solid #d8eed4;animation:fadeSlide 0.3s ease}
-        .food-emoji{font-size:22px;flex-shrink:0;margin-right:10px}
-        .food-name{font-weight:600;color:#1e3a1e;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .food-portion{font-size:10px;color:#8aaa7a}
-        .food-macro{text-align:center;margin-right:8px}
-        .food-macro-val{font-size:10px;font-weight:700}
-        .food-macro-lbl{font-size:9px;color:#a0baa0}
-        .food-cal{font-size:15px;color:#3a7a3a;font-weight:700;font-family:'Fraunces',serif}
-        .food-cal-lbl{font-size:9px;color:#9ab89a}
-        .remove-btn{background:none;border:none;cursor:pointer;color:#c8b0b0;font-size:13px;padding:2px 3px;margin-left:4px}
-        .empty-state{text-align:center;padding:32px 20px;color:#b0c8a8}
-        .modal-overlay{position:fixed;inset:0;background:rgba(20,40,20,.45);z-index:100;display:flex;align-items:flex-end;justify-content:center}
-        .modal-box{background:white;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:430px;max-height:90vh;overflow-y:auto}
-        .modal-title{font-family:'Fraunces',serif;font-size:22px;color:#1a3a1a;margin:0}
-        .form-label{font-size:11px;font-weight:600;color:#5a7a5a;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;display:block;margin-top:10px}
-        .form-input{width:100%;border:1.5px solid #dceeda;border-radius:12px;padding:9px 12px;font-size:14px;color:#1e3a1e;background:#f8fcf6;outline:none}
-        .obj-btn{flex:1;padding:8px 4px;border-radius:12px;border:1.5px solid #d0e8cc;font-size:12px;font-weight:600;cursor:pointer;background:#f2faf0;color:#4a7a4a}
-        .obj-btn.active{background:#3da050;border-color:#3da050;color:white}
-        .save-btn{width:100%;padding:14px;border-radius:16px;border:none;background:linear-gradient(135deg,#5fc96e,#3da050);color:white;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px}
-        .goals-preview{background:linear-gradient(135deg,#ecf8e8,#f4fdf0);border:1px solid #cce8c4;border-radius:16px;padding:14px 16px;margin-top:16px}
-        .goals-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
-        .goal-item{text-align:center}
-        .goal-val{font-size:15px;font-weight:700;font-family:'Fraunces',serif}
-        .goal-lbl{font-size:9px;color:#8aaa7a}
-        .week-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px}
-        .week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-        .week-bar-val{font-size:9px;color:#6b876b}
-        .week-bar-inner{width:100%;display:flex;align-items:flex-end;height:60px}
-        .week-bar{width:100%;border-radius:6px 6px 4px 4px}
-        .week-day{font-size:10px;color:#9ab89a}
-        .week-day.today{color:#3a7a3a;font-weight:700}
-        .ai-btn{background:linear-gradient(135deg,#5fc96e,#3da050);border:none;border-radius:10px;padding:6px 14px;color:white;font-size:12px;font-weight:700;cursor:pointer}
-        .history-day{margin-bottom:12px;padding:14px 16px;border-radius:18px;border:1px solid #e4eee0;background:#f8fcf7}
-        .history-day.today{background:linear-gradient(135deg,#ecf8e8,#f4fdf0);border-color:#b8e0b0}
-        .footer{text-align:center;margin-top:22px;font-size:11px;color:#a8c4a0;padding-bottom:20px}
-        .foto-btn{width:100%;padding:14px;border-radius:14px;border:2px dashed #a8d8a0;background:#f2faf0;color:#3a7a3a;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-        .foto-preview{width:100%;border-radius:14px;margin-bottom:10px;display:none;max-height:220px;object-fit:cover}
-        .foto-resultado{background:linear-gradient(135deg,#ecf8e8,#f4fdf0);border:1px solid #cce8c4;border-radius:14px;padding:12px 14px;margin-bottom:10px;display:none;animation:fadeSlide 0.3s ease}
-        .foto-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #d8eed4;font-size:12px;color:#3a5a3a}
-        .foto-item:last-child{border-bottom:none}
-        .foto-item-cal{font-weight:700;color:#3a7a3a;font-family:'Fraunces',serif;font-size:14px}
-        .foto-agregar-btn{width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#5fc96e,#3da050);color:white;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px}
-        .foto-loading{display:none;text-align:center;padding:24px 20px;color:#7aaa7a}
-        .dos-botones{display:flex;gap:8px;margin-bottom:10px}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(160deg, #eaf5e6, #f4fbf0, #e8f5e2); min-height: 100vh; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #b8d8b0; border-radius: 99px; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+        .wrap { max-width: 430px; margin: 0 auto; padding-bottom: 60px; }
+        .header { padding: 28px 20px 20px; background: linear-gradient(180deg, #dff2d8, transparent); border-bottom: 1px solid #d4eed0; }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .header-title { font-family: 'Fraunces', serif; font-size: 24px; color: #1a3a1a; font-weight: 700; }
+        .header-sub { font-size: 12px; color: #7aaa7a; margin-top: 4px; text-transform: capitalize; }
+        .header-label { font-size: 11px; letter-spacing: 3px; color: #5a9a5a; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .btn-header { background: white; border: 1px solid #d0e8cc; border-radius: 12px; padding: 7px 11px; font-size: 11px; color: #4a7a4a; cursor: pointer; font-weight: 600; }
+        .btn-header.active { background: linear-gradient(135deg, #5fc96e, #3da050); border-color: #3da050; color: white; }
+        .card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 3px 18px rgba(50,100,50,.07); margin-bottom: 14px; }
+        .card-title { font-size: 11px; color: #7aaa7a; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .ring-wrap { background: white; border-radius: 24px; padding: 18px 20px; box-shadow: 0 6px 30px rgba(50,100,50,.09); display: flex; align-items: center; gap: 18px; }
+        .macro-row { display: flex; justify-content: space-between; font-size: 11px; color: #6b876b; margin-bottom: 3px; }
+        .macro-bg { height: 6px; border-radius: 99px; background: #e4f0e0; margin-bottom: 8px; }
+        .macro-fill { height: 100%; border-radius: 99px; transition: width 0.7s; }
+        .remaining { padding: 7px 12px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+        .tabs { display: flex; gap: 6px; background: white; border-radius: 14px; padding: 4px; box-shadow: 0 2px 10px rgba(50,100,50,.06); margin-bottom: 14px; }
+        .tab-btn { flex: 1; padding: 9px; border-radius: 10px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: transparent; color: #7aaa7a; }
+        .tab-btn.active { background: linear-gradient(135deg, #5fc96e, #3da050); color: white; }
+        .meal-btns { display: flex; gap: 6px; margin-bottom: 12px; }
+        .meal-btn { flex: 1; padding: 7px 2px; border-radius: 10px; border: 1.5px solid #dceeda; font-size: 11px; font-weight: 700; cursor: pointer; background: #f8fcf6; color: #6b876b; text-align: center; }
+        .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-input { flex: 1; border: 1.5px solid #dceeda; border-radius: 14px; padding: 11px 14px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; }
+        .search-input:focus { border-color: #6abf7a; }
+        .search-btn { width: 46px; height: 46px; border-radius: 14px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .search-btn:disabled { background: #c8e4c4; cursor: default; }
+        .quick-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+        .quick-btn { background: #f2faf0; border: 1px solid #d0e8cc; border-radius: 99px; padding: 5px 11px; font-size: 12px; color: #4a7a4a; cursor: pointer; font-weight: 500; }
+        .error-box { font-size: 12px; color: #c06050; background: #fff5f3; border: 1px solid #f0d0c8; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; }
+        .food-card { display: flex; align-items: center; padding: 10px 12px; margin-bottom: 6px; border-radius: 14px; background: #f5fcf3; border: 1px solid #d8eed4; animation: fadeSlide 0.3s ease; }
+        .food-emoji { font-size: 22px; flex-shrink: 0; margin-right: 10px; }
+        .food-name { font-weight: 600; color: #1e3a1e; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .food-portion { font-size: 10px; color: #8aaa7a; }
+        .food-macro { text-align: center; margin-right: 8px; }
+        .food-macro-val { font-size: 10px; font-weight: 700; }
+        .food-macro-lbl { font-size: 9px; color: #a0baa0; }
+        .food-cal { font-size: 15px; color: #3a7a3a; font-weight: 700; font-family: 'Fraunces', serif; }
+        .food-cal-lbl { font-size: 9px; color: #9ab89a; }
+        .remove-btn { background: none; border: none; cursor: pointer; color: #c8b0b0; font-size: 13px; padding: 2px 3px; margin-left: 4px; }
+        .empty-state { text-align: center; padding: 32px 20px; color: #b0c8a8; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(20,40,20,.45); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+        .modal-box { background: white; border-radius: 28px 28px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-family: 'Fraunces', serif; font-size: 22px; color: #1a3a1a; margin: 0; }
+        .form-label { font-size: 11px; font-weight: 600; color: #5a7a5a; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 10px; }
+        .form-input { width: 100%; border: 1.5px solid #dceeda; border-radius: 12px; padding: 9px 12px; font-size: 14px; color: #1e3a1e; background: #f8fcf6; outline: none; }
+        .obj-btn { flex: 1; padding: 8px 4px; border-radius: 12px; border: 1.5px solid #d0e8cc; font-size: 12px; font-weight: 600; cursor: pointer; background: #f2faf0; color: #4a7a4a; }
+        .obj-btn.active { background: #3da050; border-color: #3da050; color: white; }
+        .save-btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+        .goals-preview { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 16px; padding: 14px 16px; margin-top: 16px; }
+        .goals-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+        .goal-item { text-align: center; }
+        .goal-val { font-size: 15px; font-weight: 700; font-family: 'Fraunces', serif; }
+        .goal-lbl { font-size: 9px; color: #8aaa7a; }
+        .week-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 8px; }
+        .week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .week-bar-val { font-size: 9px; color: #6b876b; }
+        .week-bar-inner { width: 100%; display: flex; align-items: flex-end; height: 60px; }
+        .week-bar { width: 100%; border-radius: 6px 6px 4px 4px; }
+        .week-day { font-size: 10px; color: #9ab89a; }
+        .week-day.today { color: #3a7a3a; font-weight: 700; }
+        .ai-btn { background: linear-gradient(135deg, #5fc96e, #3da050); border: none; border-radius: 10px; padding: 6px 14px; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .history-day { margin-bottom: 12px; padding: 14px 16px; border-radius: 18px; border: 1px solid #e4eee0; background: #f8fcf7; }
+        .history-day.today { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border-color: #b8e0b0; }
+        .footer { text-align: center; margin-top: 22px; font-size: 11px; color: #a8c4a0; padding-bottom: 20px; }
+        .foto-btn { width: 100%; padding: 14px; border-radius: 14px; border: 2px dashed #a8d8a0; background: #f2faf0; color: #3a7a3a; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        .foto-preview { width: 100%; border-radius: 14px; margin-bottom: 10px; display: none; max-height: 220px; object-fit: cover; }
+        .foto-resultado { background: linear-gradient(135deg, #ecf8e8, #f4fdf0); border: 1px solid #cce8c4; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; display: none; animation: fadeSlide 0.3s ease; }
+        .foto-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #d8eed4; font-size: 12px; color: #3a5a3a; }
+        .foto-item:last-child { border-bottom: none; }
+        .foto-item-cal { font-weight: 700; color: #3a7a3a; font-family: 'Fraunces', serif; font-size: 14px; }
+        .foto-agregar-btn { width: 100%; padding: 11px; border-radius: 12px; border: none; background: linear-gradient(135deg, #5fc96e, #3da050); color: white; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .foto-loading { display: none; text-align: center; padding: 24px 20px; color: #7aaa7a; }
     </style>
 </head>
 <body>
-
-<!-- INPUTS OCULTOS FIJOS EN EL HTML - UNICA FORMA QUE FUNCIONA EN ANDROID -->
-<div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden">
-    <input type="file" id="inputCamara" accept="image/*" capture="environment"/>
-    <input type="file" id="inputGaleria" accept="image/*"/>
-</div>
-
 <div class="wrap">
     <div class="header">
         <div class="header-top">
@@ -164,24 +157,13 @@
         <div id="view-foto" style="display:none">
             <div class="card">
                 <div class="card-title">📷 Analizá tu comida con IA</div>
-                <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">Seleccioná la comida, sacá una foto o elegí de la galería. La IA detecta los alimentos y calcula las calorías.</div>
+                <div style="font-size:12px;color:#8aaa7a;margin-bottom:12px">Seleccioná la comida y sacá una foto. La IA detecta los alimentos y calcula las calorías automáticamente.</div>
                 <div class="meal-btns" id="mealBtnsFoto"></div>
-                <div class="dos-botones">
-                    <button class="foto-btn" style="flex:1" onclick="abrirCamara()">
-                        <span style="font-size:26px">📷</span>
-                        <div>
-                            <div style="font-size:13px;font-weight:700">Sacar foto</div>
-                            <div style="font-size:10px;font-weight:400;color:#7aaa7a;margin-top:2px">Abrir cámara</div>
-                        </div>
-                    </button>
-                    <button class="foto-btn" style="flex:1" onclick="abrirGaleria()">
-                        <span style="font-size:26px">🖼️</span>
-                        <div>
-                            <div style="font-size:13px;font-weight:700">Galería</div>
-                            <div style="font-size:10px;font-weight:400;color:#7aaa7a;margin-top:2px">Elegir imagen</div>
-                        </div>
-                    </button>
-                </div>
+                <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="analizarFoto(this)"/>
+                <button class="foto-btn" onclick="document.getElementById('fotoInput').click()">
+                    <span style="font-size:26px">📷</span>
+                    <div><div style="font-size:14px">Sacar foto o elegir imagen</div><div style="font-size:11px;font-weight:400;color:#7aaa7a;margin-top:2px">La IA analiza los alimentos automáticamente</div></div>
+                </button>
                 <img id="fotoPreview" class="foto-preview"/>
                 <div id="fotoLoading" class="foto-loading">
                     <div style="font-size:36px;margin-bottom:10px"><span class="spin">🔍</span></div>
@@ -262,236 +244,261 @@
 </div>
 
 <script>
-let API_KEY="";
-fetch("/api/key").then(r=>r.json()).then(d=>{API_KEY=d.key;});
-const MODEL="claude-sonnet-4-20250514";
-const SYSTEM_PROMPT=`Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
-const ADVICE_PROMPT=`Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
-const PHOTO_PROMPT=`Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
-const MEALS=[{key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},{key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},{key:"merienda",label:"Merienda",emoji:"🍵",color:"#f0a050"},{key:"cena",label:"Cena",emoji:"🌙",color:"#7890f0"}];
-const QUICK=["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
-const ACTS={sedentario:1.2,ligero:1.375,moderado:1.55,activo:1.725};
-const OBJS={bajar:0.8,mantener:1.0,subir:1.2};
-let activeMeal="desayuno",activeMealFoto="almuerzo",currentObj="mantener";
-let meals=loadLS("ct:meals:"+todayKey(),{desayuno:[],almuerzo:[],merienda:[],cena:[]});
-let profile=loadLS("ct:profile",{});
-let history=loadLS("ct:history",{});
-let fotoItemsDetectados=[];
+let API_KEY = "";
+fetch("/api/key").then(r => r.json()).then(d => { API_KEY = d.key; });
+const MODEL = "claude-sonnet-4-20250514";
+const SYSTEM_PROMPT = `Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
+const ADVICE_PROMPT = `Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
+const PHOTO_PROMPT = `Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
+const MEALS = [
+    {key:"desayuno", label:"Desayuno", emoji:"🌅", color:"#f0c050"},
+    {key:"almuerzo", label:"Almuerzo", emoji:"☀️", color:"#52c478"},
+    {key:"merienda", label:"Merienda", emoji:"🍵", color:"#f0a050"},
+    {key:"cena",     label:"Cena",     emoji:"🌙", color:"#7890f0"}
+];
+const QUICK = ["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
+const ACTS = {sedentario:1.2, ligero:1.375, moderado:1.55, activo:1.725};
+const OBJS = {bajar:0.8, mantener:1.0, subir:1.2};
+let activeMeal = "desayuno", activeMealFoto = "almuerzo", currentObj = "mantener";
+let meals = loadLS("ct:meals:" + todayKey(), {desayuno:[], almuerzo:[], merienda:[], cena:[]});
+let profile = loadLS("ct:profile", {});
+let history = loadLS("ct:history", {});
+let fotoItemsDetectados = [];
 
-function todayKey(){return new Date().toISOString().split("T")[0];}
-function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
-function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-function calcGoals(p){const w=Number(p.weight)||70,h=Number(p.height)||170,a=Number(p.age)||25;const bmr=p.sex==="F"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;const cal=Math.round(bmr*(ACTS[p.activity]||1.55)*(OBJS[p.objective]||1));return{calories:cal,protein:Math.round(w*1.8),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:30};}
-function getGoals(){return profile.weight?calcGoals(profile):{calories:2000,protein:150,carbs:250,fat:65,fiber:30};}
-function getAllFoods(){return Object.values(meals).flat();}
-function getTotals(){return getAllFoods().reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat,fiber:a.fiber+f.fiber}),{calories:0,protein:0,carbs:0,fat:0,fiber:0});}
-function persistMeals(upd){meals=upd;const t=todayKey();history[t]=upd;saveLS("ct:meals:"+t,upd);saveLS("ct:history",history);render();}
-
-// SOLUCION DEFINITIVA PARA ANDROID
-// Los inputs estan fijos en el HTML pero se resetean cada vez con cloneNode
-function abrirCamara(){
-    const viejo=document.getElementById("inputCamara");
-    const nuevo=viejo.cloneNode(true);
-    nuevo.value="";
-    nuevo.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
-    viejo.parentNode.replaceChild(nuevo,viejo);
-    nuevo.click();
+function todayKey() { return new Date().toISOString().split("T")[0]; }
+function loadLS(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function saveLS(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function calcGoals(p) {
+    const w = Number(p.weight)||70, h = Number(p.height)||170, a = Number(p.age)||25;
+    const bmr = p.sex === "F" ? 10*w + 6.25*h - 5*a - 161 : 10*w + 6.25*h - 5*a + 5;
+    const cal = Math.round(bmr * (ACTS[p.activity]||1.55) * (OBJS[p.objective]||1));
+    return {calories:cal, protein:Math.round(w*1.8), carbs:Math.round(cal*0.45/4), fat:Math.round(cal*0.25/9), fiber:30};
+}
+function getGoals() { return profile.weight ? calcGoals(profile) : {calories:2000, protein:150, carbs:250, fat:65, fiber:30}; }
+function getAllFoods() { return Object.values(meals).flat(); }
+function getTotals() {
+    return getAllFoods().reduce((a,f) => ({
+        calories: a.calories + f.calories, protein: a.protein + f.protein,
+        carbs: a.carbs + f.carbs, fat: a.fat + f.fat, fiber: a.fiber + f.fiber
+    }), {calories:0, protein:0, carbs:0, fat:0, fiber:0});
+}
+function persistMeals(upd) {
+    meals = upd;
+    const t = todayKey();
+    history[t] = upd;
+    saveLS("ct:meals:" + t, upd);
+    saveLS("ct:history", history);
+    render();
 }
 
-function abrirGaleria(){
-    const viejo=document.getElementById("inputGaleria");
-    const nuevo=viejo.cloneNode(true);
-    nuevo.value="";
-    nuevo.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
-    viejo.parentNode.replaceChild(nuevo,viejo);
-    nuevo.click();
+function render() {
+    document.getElementById("todayDate").textContent = new Date().toLocaleDateString("es-AR", {weekday:"long", day:"numeric", month:"long"});
+    const g = getGoals(), t = getTotals();
+    const circ = 289.03, pct = Math.min(t.calories / g.calories, 1);
+    const color = t.calories > g.calories ? "#e8806a" : t.calories > g.calories * 0.8 ? "#f0b84a" : "#52b86a";
+    document.getElementById("ringArc").setAttribute("stroke-dashoffset", circ * (1 - pct));
+    document.getElementById("ringArc").setAttribute("stroke", color);
+    document.getElementById("ringVal").textContent = Math.round(t.calories);
+    const rem = g.calories - t.calories;
+    const box = document.getElementById("remainingBox"), txt = document.getElementById("remainingText");
+    if (rem >= 0) { box.style.background = "#f0fced"; box.style.border = "1px solid #c8e8c0"; txt.style.color = "#3a7a3a"; txt.textContent = Math.round(rem) + " kcal libres"; }
+    else { box.style.background = "#fff0ec"; box.style.border = "1px solid #f0c8b8"; txt.style.color = "#c05a3a"; txt.textContent = Math.abs(Math.round(rem)) + " kcal de mas"; }
+    document.getElementById("macroBars").innerHTML = [["Proteina",t.protein,g.protein,"#52c478"],["Carbohidratos",t.carbs,g.carbs,"#f0c050"],["Grasas",t.fat,g.fat,"#f07a5a"],["Fibra",t.fiber,g.fiber,"#78c0f0"]].map(([l,v,m,c]) => `<div class="macro-row"><span style="font-weight:600">${l}</span><span>${Math.round(v)}/${m}g</span></div><div class="macro-bg"><div class="macro-fill" style="width:${Math.min(v/m*100,100)}%;background:${c}"></div></div>`).join("");
+    document.getElementById("mealBtns").innerHTML = MEALS.map(m => `<button class="meal-btn${activeMeal===m.key?" active":""}" style="${activeMeal===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMeal('${m.key}')"><div>${m.emoji}</div><div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("mealBtnsFoto").innerHTML = MEALS.map(m => `<button class="meal-btn${activeMealFoto===m.key?" active":""}" style="${activeMealFoto===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMealFoto('${m.key}')"><div>${m.emoji}</div><div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
+    document.getElementById("searchInput").placeholder = "Agregar a " + MEALS.find(m => m.key === activeMeal).label.toLowerCase() + "...";
+    document.getElementById("quickBtns").innerHTML = QUICK.map(s => `<button class="quick-btn" onclick="quickSearch('${s}')">${s}</button>`).join("");
+    let html = "";
+    MEALS.forEach(meal => {
+        const mf = meals[meal.key]; if (!mf.length) return;
+        const mc = mf.reduce((a,f) => a + f.calories, 0);
+        html += `<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:16px">${meal.emoji}</span><span style="font-weight:700;color:#1e3a1e;font-size:13px">${meal.label}</span><span style="font-size:11px;color:#9ab89a;margin-left:auto">${Math.round(mc)} kcal</span></div>`;
+        mf.forEach(f => { html += `<div class="food-card"><span class="food-emoji">${f.emoji}</span><div style="flex:1;min-width:0"><div class="food-name">${f.name}</div><div class="food-portion">${f.portion}</div></div><div style="display:flex;align-items:center;flex-shrink:0"><div class="food-macro"><div class="food-macro-val" style="color:#5aba72">${Math.round(f.protein)}</div><div class="food-macro-lbl">P</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f0b84a">${Math.round(f.carbs)}</div><div class="food-macro-lbl">C</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f07a5a">${Math.round(f.fat)}</div><div class="food-macro-lbl">G</div></div><div style="text-align:center;margin:0 4px"><div class="food-cal">${f.calories}</div><div class="food-cal-lbl">kcal</div></div><button class="remove-btn" onclick="removeFood('${meal.key}',${f.id})">✕</button></div></div>`; });
+        html += "</div>";
+    });
+    if (!getAllFoods().length) html = `<div class="empty-state"><div style="font-size:44px;margin-bottom:12px">🥗</div><div style="font-size:16px;color:#90b080;margin-bottom:6px">Tu plato esta vacio</div><div style="font-size:12px">Selecciona una comida y describe que comiste</div></div>`;
+    document.getElementById("foodList").innerHTML = html;
+    document.getElementById("adviceCard").style.display = getAllFoods().length ? "block" : "none";
+    const dias = Object.keys(history).filter(d => d !== todayKey()).length;
+    document.getElementById("historyCount").textContent = dias > 0 ? dias + "d" : "Historial";
+    if (document.getElementById("view-semana").style.display !== "none") renderWeek();
 }
 
-async function procesarImagen(file){
-    const preview=document.getElementById("fotoPreview");
-    const reader=new FileReader();
-    reader.onload=async(e)=>{
-        preview.src=e.target.result;
-        preview.style.display="block";
-        document.getElementById("fotoLoading").style.display="block";
-        document.getElementById("fotoResultado").style.display="none";
-        document.getElementById("fotoError").style.display="none";
-        const base64=e.target.result.split(",")[1];
-        const mediaType=file.type||"image/jpeg";
-        try{
-            const res=await fetch("https://api.anthropic.com/v1/messages",{
-                method:"POST",
-                headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-                body:JSON.stringify({model:MODEL,max_tokens:1000,messages:[{role:"user",content:[
-                    {type:"image",source:{type:"base64",media_type:mediaType,data:base64}},
-                    {type:"text",text:PHOTO_PROMPT}
-                ]}]})
+async function analizarFoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const preview = document.getElementById("fotoPreview");
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+        document.getElementById("fotoLoading").style.display = "block";
+        document.getElementById("fotoResultado").style.display = "none";
+        document.getElementById("fotoError").style.display = "none";
+        const base64 = e.target.result.split(",")[1];
+        const mediaType = file.type || "image/jpeg";
+        try {
+            const res = await fetch("https://api.anthropic.com/v1/messages", {
+                method: "POST",
+                headers: {"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+                body: JSON.stringify({
+                    model: MODEL, max_tokens: 1000,
+                    messages: [{role:"user", content:[
+                        {type:"image", source:{type:"base64", media_type:mediaType, data:base64}},
+                        {type:"text", text:PHOTO_PROMPT}
+                    ]}]
+                })
             });
-            const data=await res.json();
-            document.getElementById("fotoLoading").style.display="none";
-            if(data.error){document.getElementById("fotoError").textContent="Error: "+data.error.message;document.getElementById("fotoError").style.display="block";return;}
-            const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
-            const match=text?.match(/\{[\s\S]*\}/);
-            if(!match){document.getElementById("fotoError").textContent="No pude analizar la imagen. Intenta con otra foto.";document.getElementById("fotoError").style.display="block";return;}
-            const resultado=JSON.parse(match[0]);
-            fotoItemsDetectados=resultado.items||[];
-            const total=fotoItemsDetectados.reduce((a,f)=>a+f.calories,0);
-            document.getElementById("fotoItems").innerHTML=fotoItemsDetectados.map(f=>`<div class="foto-item"><span>${f.emoji} <strong>${f.name}</strong> <span style="color:#9ab89a;font-size:10px">(${f.portion})</span></span><span class="foto-item-cal">${f.calories} kcal</span></div>`).join("");
-            document.getElementById("fotoTotal").textContent=Math.round(total)+" kcal";
-            document.getElementById("fotoResultado").style.display="block";
-        }catch(e){
-            document.getElementById("fotoLoading").style.display="none";
-            document.getElementById("fotoError").textContent="Error al analizar: "+e.message;
-            document.getElementById("fotoError").style.display="block";
+            const data = await res.json();
+            document.getElementById("fotoLoading").style.display = "none";
+            if (data.error) { document.getElementById("fotoError").textContent = "Error: " + data.error.message; document.getElementById("fotoError").style.display = "block"; return; }
+            const text = data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+            const match = text?.match(/\{[\s\S]*\}/);
+            if (!match) { document.getElementById("fotoError").textContent = "No pude analizar la imagen. Intenta con otra foto."; document.getElementById("fotoError").style.display = "block"; return; }
+            const resultado = JSON.parse(match[0]);
+            fotoItemsDetectados = resultado.items || [];
+            const total = fotoItemsDetectados.reduce((a,f) => a + f.calories, 0);
+            document.getElementById("fotoItems").innerHTML = fotoItemsDetectados.map(f => `
+                <div class="foto-item">
+                    <span>${f.emoji} <strong>${f.name}</strong> <span style="color:#9ab89a;font-size:10px">(${f.portion})</span></span>
+                    <span class="foto-item-cal">${f.calories} kcal</span>
+                </div>
+            `).join("");
+            document.getElementById("fotoTotal").textContent = Math.round(total) + " kcal";
+            document.getElementById("fotoResultado").style.display = "block";
+        } catch(e) {
+            document.getElementById("fotoLoading").style.display = "none";
+            document.getElementById("fotoError").textContent = "Error al analizar: " + e.message;
+            document.getElementById("fotoError").style.display = "block";
         }
     };
     reader.readAsDataURL(file);
 }
 
-function agregarFotoAlDia(){
-    if(!fotoItemsDetectados.length)return;
-    const nuevos=fotoItemsDetectados.map(f=>({id:Date.now()+Math.random(),name:f.name,emoji:f.emoji,calories:Number(f.calories)||0,protein:Number(f.protein)||0,carbs:Number(f.carbs)||0,fat:Number(f.fat)||0,fiber:Number(f.fiber)||0,portion:f.portion||"1 porcion"}));
-    persistMeals({...meals,[activeMealFoto]:[...nuevos,...meals[activeMealFoto]]});
+function agregarFotoAlDia() {
+    if (!fotoItemsDetectados.length) return;
+    const nuevos = fotoItemsDetectados.map(f => ({
+        id: Date.now() + Math.random(),
+        name: f.name, emoji: f.emoji,
+        calories: Number(f.calories)||0, protein: Number(f.protein)||0,
+        carbs: Number(f.carbs)||0, fat: Number(f.fat)||0,
+        fiber: Number(f.fiber)||0, portion: f.portion||"1 porcion"
+    }));
+    persistMeals({...meals, [activeMealFoto]: [...nuevos, ...meals[activeMealFoto]]});
     setTab("hoy");
-    document.getElementById("fotoResultado").style.display="none";
-    document.getElementById("fotoPreview").style.display="none";
-    fotoItemsDetectados=[];
+    document.getElementById("fotoResultado").style.display = "none";
+    document.getElementById("fotoPreview").style.display = "none";
+    document.getElementById("fotoInput").value = "";
+    fotoItemsDetectados = [];
 }
 
-function render(){
-    document.getElementById("todayDate").textContent=new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
-    const g=getGoals(),t=getTotals();
-    const circ=289.03,pct=Math.min(t.calories/g.calories,1);
-    const color=t.calories>g.calories?"#e8806a":t.calories>g.calories*0.8?"#f0b84a":"#52b86a";
-    document.getElementById("ringArc").setAttribute("stroke-dashoffset",circ*(1-pct));
-    document.getElementById("ringArc").setAttribute("stroke",color);
-    document.getElementById("ringVal").textContent=Math.round(t.calories);
-    const rem=g.calories-t.calories;
-    const box=document.getElementById("remainingBox"),txt=document.getElementById("remainingText");
-    if(rem>=0){box.style.background="#f0fced";box.style.border="1px solid #c8e8c0";txt.style.color="#3a7a3a";txt.textContent=Math.round(rem)+" kcal libres";}
-    else{box.style.background="#fff0ec";box.style.border="1px solid #f0c8b8";txt.style.color="#c05a3a";txt.textContent=Math.abs(Math.round(rem))+" kcal de mas";}
-    document.getElementById("macroBars").innerHTML=[["Proteina",t.protein,g.protein,"#52c478"],["Carbohidratos",t.carbs,g.carbs,"#f0c050"],["Grasas",t.fat,g.fat,"#f07a5a"],["Fibra",t.fiber,g.fiber,"#78c0f0"]].map(([l,v,m,c])=>`<div class="macro-row"><span style="font-weight:600">${l}</span><span>${Math.round(v)}/${m}g</span></div><div class="macro-bg"><div class="macro-fill" style="width:${Math.min(v/m*100,100)}%;background:${c}"></div></div>`).join("");
-    document.getElementById("mealBtns").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMeal===m.key?" active":""}" style="${activeMeal===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMeal('${m.key}')"><div>${m.emoji}</div><div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
-    document.getElementById("mealBtnsFoto").innerHTML=MEALS.map(m=>`<button class="meal-btn${activeMealFoto===m.key?" active":""}" style="${activeMealFoto===m.key?"background:"+m.color+";border-color:"+m.color+";color:white":""}" onclick="setMealFoto('${m.key}')"><div>${m.emoji}</div><div style="font-size:9px;margin-top:1px">${m.label}</div></button>`).join("");
-    document.getElementById("searchInput").placeholder="Agregar a "+MEALS.find(m=>m.key===activeMeal).label.toLowerCase()+"...";
-    document.getElementById("quickBtns").innerHTML=QUICK.map(s=>`<button class="quick-btn" onclick="quickSearch('${s}')">${s}</button>`).join("");
-    let html="";
-    MEALS.forEach(meal=>{
-        const mf=meals[meal.key];if(!mf.length)return;
-        const mc=mf.reduce((a,f)=>a+f.calories,0);
-        html+=`<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:16px">${meal.emoji}</span><span style="font-weight:700;color:#1e3a1e;font-size:13px">${meal.label}</span><span style="font-size:11px;color:#9ab89a;margin-left:auto">${Math.round(mc)} kcal</span></div>`;
-        mf.forEach(f=>{html+=`<div class="food-card"><span class="food-emoji">${f.emoji}</span><div style="flex:1;min-width:0"><div class="food-name">${f.name}</div><div class="food-portion">${f.portion}</div></div><div style="display:flex;align-items:center;flex-shrink:0"><div class="food-macro"><div class="food-macro-val" style="color:#5aba72">${Math.round(f.protein)}</div><div class="food-macro-lbl">P</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f0b84a">${Math.round(f.carbs)}</div><div class="food-macro-lbl">C</div></div><div class="food-macro"><div class="food-macro-val" style="color:#f07a5a">${Math.round(f.fat)}</div><div class="food-macro-lbl">G</div></div><div style="text-align:center;margin:0 4px"><div class="food-cal">${f.calories}</div><div class="food-cal-lbl">kcal</div></div><button class="remove-btn" onclick="removeFood('${meal.key}',${f.id})">✕</button></div></div>`;});
-        html+="</div>";
-    });
-    if(!getAllFoods().length)html=`<div class="empty-state"><div style="font-size:44px;margin-bottom:12px">🥗</div><div style="font-size:16px;color:#90b080;margin-bottom:6px">Tu plato esta vacio</div><div style="font-size:12px">Selecciona una comida y describe que comiste</div></div>`;
-    document.getElementById("foodList").innerHTML=html;
-    document.getElementById("adviceCard").style.display=getAllFoods().length?"block":"none";
-    const dias=Object.keys(history).filter(d=>d!==todayKey()).length;
-    document.getElementById("historyCount").textContent=dias>0?dias+"d":"Historial";
-    if(document.getElementById("view-semana").style.display!=="none")renderWeek();
-}
-
-function renderWeek(){
-    const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split("T")[0];});
-    const names=["D","L","M","X","J","V","S"],g=getGoals(),maxV=g.calories*1.3;
-    document.getElementById("weekBars").innerHTML=days.map(day=>{
-        const foods=Object.values(history[day]||{}).flat();
-        const cal=foods.reduce((a,f)=>a+f.calories,0);
-        const pct=cal>0?Math.min(cal/maxV*100,100):0;
-        const isToday=day===todayKey(),over=cal>g.calories;
-        const bg=isToday?"#3da050":over?"#e8806a":cal>0?"#7acd8a":"#e4f0e0";
-        const d=new Date(day+"T12:00:00");
-        return`<div class="week-bar-wrap">${cal>0?`<div class="week-bar-val" style="color:${over?"#e8806a":"#6b876b"}">${Math.round(cal/100)/10}k</div>`:""}<div class="week-bar-inner"><div class="week-bar" style="height:${Math.max(pct,4)}%;background:${bg};min-height:${cal>0?8:4}px"></div></div><div class="week-day${isToday?" today":""}">${names[d.getDay()]}</div></div>`;
+function renderWeek() {
+    const days = Array.from({length:7}, (_,i) => { const d = new Date(); d.setDate(d.getDate()-6+i); return d.toISOString().split("T")[0]; });
+    const names = ["D","L","M","X","J","V","S"], g = getGoals(), maxV = g.calories * 1.3;
+    document.getElementById("weekBars").innerHTML = days.map(day => {
+        const foods = Object.values(history[day]||{}).flat();
+        const cal = foods.reduce((a,f) => a + f.calories, 0);
+        const pct = cal > 0 ? Math.min(cal/maxV*100, 100) : 0;
+        const isToday = day === todayKey(), over = cal > g.calories;
+        const bg = isToday ? "#3da050" : over ? "#e8806a" : cal > 0 ? "#7acd8a" : "#e4f0e0";
+        const d = new Date(day + "T12:00:00");
+        return `<div class="week-bar-wrap">${cal>0?`<div class="week-bar-val" style="color:${over?"#e8806a":"#6b876b"}">${Math.round(cal/100)/10}k</div>`:""}<div class="week-bar-inner"><div class="week-bar" style="height:${Math.max(pct,4)}%;background:${bg};min-height:${cal>0?8:4}px"></div></div><div class="week-day${isToday?" today":""}">${names[d.getDay()]}</div></div>`;
     }).join("");
-    const dwd=days.filter(d=>history[d]&&Object.values(history[d]).flat().length>0);
-    if(!dwd.length){document.getElementById("weekSummary").innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:36px">📊</div><div style="color:#90b080;margin-top:8px">Registra comidas para ver tu progreso</div></div>`;return;}
-    const avgCal=Math.round(dwd.reduce((a,d)=>a+Object.values(history[d]).flat().reduce((x,f)=>x+f.calories,0),0)/dwd.length);
-    const diff=avgCal-g.calories;
-    document.getElementById("weekSummary").innerHTML=`<div class="card-title">✦ Resumen semanal</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[["📊","Promedio diario",avgCal+" kcal","#3a7a3a"],["📅","Dias registrados",dwd.length+" de 7","#5a8a5a"],["🎯","Meta diaria",g.calories+" kcal","#5a6a9a"],[diff>0?"⬆️":"✅","Diferencia prom.",(diff>0?"+":"")+diff+" kcal",diff>0?"#c05a3a":"#3a7a3a"]].map(([icon,lbl,val,color])=>`<div style="padding:12px 14px;border-radius:14px;background:#f8fcf6;border:1px solid #e0eede"><div style="font-size:18px;margin-bottom:4px">${icon}</div><div style="font-size:17px;color:${color};font-weight:700;font-family:Fraunces,serif">${val}</div><div style="font-size:11px;color:#9ab89a;margin-top:2px">${lbl}</div></div>`).join("")}</div>`;
+    const dwd = days.filter(d => history[d] && Object.values(history[d]).flat().length > 0);
+    if (!dwd.length) { document.getElementById("weekSummary").innerHTML = `<div style="text-align:center;padding:20px"><div style="font-size:36px">📊</div><div style="color:#90b080;margin-top:8px">Registra comidas para ver tu progreso</div></div>`; return; }
+    const avgCal = Math.round(dwd.reduce((a,d) => a + Object.values(history[d]).flat().reduce((x,f) => x + f.calories, 0), 0) / dwd.length);
+    const diff = avgCal - g.calories;
+    document.getElementById("weekSummary").innerHTML = `<div class="card-title">✦ Resumen semanal</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[["📊","Promedio diario",avgCal+" kcal","#3a7a3a"],["📅","Dias registrados",dwd.length+" de 7","#5a8a5a"],["🎯","Meta diaria",g.calories+" kcal","#5a6a9a"],[diff>0?"⬆️":"✅","Diferencia prom.",(diff>0?"+":"")+diff+" kcal",diff>0?"#c05a3a":"#3a7a3a"]].map(([icon,lbl,val,color]) => `<div style="padding:12px 14px;border-radius:14px;background:#f8fcf6;border:1px solid #e0eede"><div style="font-size:18px;margin-bottom:4px">${icon}</div><div style="font-size:17px;color:${color};font-weight:700;font-family:Fraunces,serif">${val}</div><div style="font-size:11px;color:#9ab89a;margin-top:2px">${lbl}</div></div>`).join("")}</div>`;
 }
 
-function setMeal(key){activeMeal=key;render();}
-function setMealFoto(key){activeMealFoto=key;render();}
-function setTab(tab){["hoy","foto","semana"].forEach(t=>{document.getElementById("view-"+t).style.display=t===tab?"block":"none";document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");});if(tab==="semana")renderWeek();}
-function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
-function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
-async function doSearch(){
-    const input=document.getElementById("searchInput");
-    const q=input.value.trim();if(!q)return;
-    const btn=document.getElementById("searchBtn");
-    btn.disabled=true;btn.innerHTML='<span class="spin">⟳</span>';setError("");
-    try{
-        const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:400,system:SYSTEM_PROMPT,messages:[{role:"user",content:q}]})});
-        const data=await res.json();
-        if(data.error){setError("Error: "+data.error.message);btn.disabled=false;btn.innerHTML="↑";return;}
-        const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
-        const match=text?.match(/\{[\s\S]*\}/);
-        if(!match){setError("Respuesta invalida");btn.disabled=false;btn.innerHTML="↑";return;}
-        const parsed=JSON.parse(match[0]);
-        if(parsed.error){setError("No reconoci ese alimento 🌿");btn.disabled=false;btn.innerHTML="↑";return;}
-        const food={id:Date.now(),name:parsed.name||q,emoji:parsed.emoji||"🍽️",calories:Number(parsed.calories)||0,protein:Number(parsed.protein)||0,carbs:Number(parsed.carbs)||0,fat:Number(parsed.fat)||0,fiber:Number(parsed.fiber)||0,portion:parsed.portion||"1 porcion"};
-        persistMeals({...meals,[activeMeal]:[food,...meals[activeMeal]]});
-        input.value="";input.focus();
-    }catch(e){setError("Error: "+e.message);}
-    btn.disabled=false;btn.innerHTML="↑";
-}
-function removeFood(mk,id){persistMeals({...meals,[mk]:meals[mk].filter(f=>f.id!=id)});}
-function clearAll(){persistMeals({desayuno:[],almuerzo:[],merienda:[],cena:[]});}
-async function getAdvice(){
-    const foods=getAllFoods();if(!foods.length)return;
-    const btn=document.getElementById("adviceBtn");btn.textContent="...";btn.disabled=true;
-    const t=getTotals(),g=getGoals();
-    const summary=`Calorias:${Math.round(t.calories)}/${g.calories}kcal Proteina:${Math.round(t.protein)}g Carbos:${Math.round(t.carbs)}g Grasas:${Math.round(t.fat)}g Fibra:${Math.round(t.fiber)}g Alimentos:${foods.map(f=>f.name).join(",")}`;
-    try{
-        const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:500,system:ADVICE_PROMPT,messages:[{role:"user",content:summary}]})});
-        const data=await res.json();
-        const text=data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
-        const match=text?.match(/\{[\s\S]*\}/);
-        if(!match){btn.textContent="Analizar mi dia";btn.disabled=false;return;}
-        const a=JSON.parse(match[0]);
-        document.getElementById("adviceContent").innerHTML=`<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#ecf8e8;border:1px solid #cce8c4;margin-bottom:12px"><div style="font-size:32px">${a.emoji}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:22px;color:#3a7a3a;font-weight:700;font-family:Fraunces,serif">${a.score}</span><span style="font-size:11px;color:#7aaa7a">/10</span><div style="flex:1;height:6px;border-radius:99px;background:#d8eed4;margin-left:4px"><div style="height:100%;width:${a.score*10}%;border-radius:99px;background:${a.score>=7?"#52c478":a.score>=5?"#f0c050":"#f07a5a"}"></div></div></div><div style="font-size:12px;color:#3a5a3a;font-weight:500">${a.summary}</div></div></div><div style="padding:10px 14px;border-radius:14px;background:#f8fff6;border:1px solid #d8eed4;margin-bottom:8px"><div style="font-size:11px;color:#52a062;font-weight:700">💚 ${a.highlight}</div></div><div style="font-size:11px;color:#5a7a5a;font-weight:700;margin-bottom:6px">SUGERENCIAS</div>${a.tips.map((tip,i)=>`<div style="display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:#3a5a3a;line-height:1.4"><span style="color:#7acd8a;font-weight:700;flex-shrink:0">${i+1}.</span>${tip}</div>`).join("")}</div>`;
-        btn.textContent="Actualizar";
-    }catch(e){btn.textContent="Analizar mi dia";}
-    btn.disabled=false;
-}
-function setObj(key){currentObj=key;document.querySelectorAll(".obj-btn").forEach((b,i)=>{b.className="obj-btn"+(["bajar","mantener","subir"][i]===key?" active":"");});updateGoalsPreview();}
-function updateGoalsPreview(){
-    const p={weight:document.getElementById("pWeight").value,height:document.getElementById("pHeight").value,age:document.getElementById("pAge").value,sex:document.getElementById("pSex").value,activity:document.getElementById("pActivity").value,objective:currentObj};
-    const g=calcGoals(p);
-    document.getElementById("goalsPreview").innerHTML=[["Cal",g.calories,"#3a7a3a"],["Prot",g.protein,"#52c478"],["Carbs",g.carbs,"#f0c050"],["Grasas",g.fat,"#f07a5a"],["Fibra",g.fiber,"#78c0f0"]].map(([l,v,c])=>`<div class="goal-item"><div class="goal-val" style="color:${c}">${v}</div><div class="goal-lbl">${l}</div></div>`).join("");
-}
-function openProfile(){
-    if(profile.weight)document.getElementById("pWeight").value=profile.weight;
-    if(profile.height)document.getElementById("pHeight").value=profile.height;
-    if(profile.age)document.getElementById("pAge").value=profile.age;
-    if(profile.sex)document.getElementById("pSex").value=profile.sex;
-    if(profile.activity)document.getElementById("pActivity").value=profile.activity;
-    if(profile.objective){currentObj=profile.objective;setObj(currentObj);}
-    updateGoalsPreview();
-    document.getElementById("profileModal").style.display="flex";
-}
-function closeProfile(){document.getElementById("profileModal").style.display="none";}
-function saveProfile(){
-    profile={weight:document.getElementById("pWeight").value,height:document.getElementById("pHeight").value,age:document.getElementById("pAge").value,sex:document.getElementById("pSex").value,activity:document.getElementById("pActivity").value,objective:currentObj};
-    saveLS("ct:profile",profile);
-    const btn=document.getElementById("profileBtn");btn.style.background="linear-gradient(135deg,#5fc96e,#3da050)";btn.style.color="white";
-    closeProfile();render();
-}
-function openHistory(){
-    const days=Object.keys(history).sort((a,b)=>b.localeCompare(a)).slice(0,14);
-    const g=getGoals();let html="";
-    if(!days.length){html=`<div style="text-align:center;padding:40px 0"><div style="font-size:40px">📭</div><div style="font-size:16px;color:#90b080;margin-top:10px">Sin historial aun</div></div>`;}
-    else days.forEach(day=>{
-        const af=Object.values(history[day]||{}).flat();
-        const tot=af.reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat}),{calories:0,protein:0,carbs:0,fat:0});
-        const pct=Math.min(tot.calories/g.calories*100,100),isToday=day===todayKey();
-        const fmt=new Date(day+"T12:00:00").toLocaleDateString("es-AR",{weekday:"short",day:"numeric",month:"short"});
-        html+=`<div class="history-day${isToday?" today":""}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span style="font-weight:700;color:#1e3a1e;font-size:13px">${isToday?"Hoy · ":""}${fmt}</span><span style="font-size:11px;color:#8aaa7a;margin-left:6px">${af.length} alimentos</span></div><span style="font-size:16px;font-weight:700;color:${tot.calories>g.calories?"#e8806a":"#3a7a3a"}">${Math.round(tot.calories)} kcal</span></div><div style="height:5px;border-radius:99px;background:#e4f0e0;margin-bottom:8px"><div style="height:100%;width:${pct}%;border-radius:99px;background:${tot.calories>g.calories?"#e8806a":"#52b86a"}"></div></div><div style="display:flex;flex-wrap:wrap;gap:4px">${af.slice(0,5).map(f=>`<span style="font-size:11px;background:white;border:1px solid #d8eed4;border-radius:99px;padding:2px 8px;color:#4a7a4a">${f.emoji} ${f.name}</span>`).join("")}${af.length>5?`<span style="font-size:11px;color:#9ab89a">+${af.length-5} mas</span>`:""}</div></div>`;
+function setMeal(key) { activeMeal = key; render(); }
+function setMealFoto(key) { activeMealFoto = key; render(); }
+function setTab(tab) {
+    ["hoy","foto","semana"].forEach(t => {
+        document.getElementById("view-"+t).style.display = t === tab ? "block" : "none";
+        document.getElementById("tab-"+t).className = "tab-btn" + (t === tab ? " active" : "");
     });
-    document.getElementById("historyList").innerHTML=html;
-    document.getElementById("historyModal").style.display="flex";
+    if (tab === "semana") renderWeek();
 }
-function closeHistory(){document.getElementById("historyModal").style.display="none";}
+function setError(msg) { const box = document.getElementById("errorBox"); if (msg) { box.textContent = msg; box.style.display = "block"; } else box.style.display = "none"; }
+function quickSearch(s) { const q = s.replace(/^\S+\s/, ""); document.getElementById("searchInput").value = q; doSearch(); }
+async function doSearch() {
+    const input = document.getElementById("searchInput");
+    const q = input.value.trim(); if (!q) return;
+    const btn = document.getElementById("searchBtn");
+    btn.disabled = true; btn.innerHTML = '<span class="spin">⟳</span>'; setError("");
+    try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {method:"POST", headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"}, body:JSON.stringify({model:MODEL, max_tokens:400, system:SYSTEM_PROMPT, messages:[{role:"user", content:q}]})});
+        const data = await res.json();
+        if (data.error) { setError("Error: " + data.error.message); btn.disabled = false; btn.innerHTML = "↑"; return; }
+        const text = data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+        const match = text?.match(/\{[\s\S]*\}/);
+        if (!match) { setError("Respuesta invalida"); btn.disabled = false; btn.innerHTML = "↑"; return; }
+        const parsed = JSON.parse(match[0]);
+        if (parsed.error) { setError("No reconoci ese alimento 🌿"); btn.disabled = false; btn.innerHTML = "↑"; return; }
+        const food = {id:Date.now(), name:parsed.name||q, emoji:parsed.emoji||"🍽️", calories:Number(parsed.calories)||0, protein:Number(parsed.protein)||0, carbs:Number(parsed.carbs)||0, fat:Number(parsed.fat)||0, fiber:Number(parsed.fiber)||0, portion:parsed.portion||"1 porcion"};
+        persistMeals({...meals, [activeMeal]: [food, ...meals[activeMeal]]});
+        input.value = ""; input.focus();
+    } catch(e) { setError("Error: " + e.message); }
+    btn.disabled = false; btn.innerHTML = "↑";
+}
+function removeFood(mk, id) { persistMeals({...meals, [mk]: meals[mk].filter(f => f.id != id)}); }
+function clearAll() { persistMeals({desayuno:[], almuerzo:[], merienda:[], cena:[]}); }
+async function getAdvice() {
+    const foods = getAllFoods(); if (!foods.length) return;
+    const btn = document.getElementById("adviceBtn"); btn.textContent = "..."; btn.disabled = true;
+    const t = getTotals(), g = getGoals();
+    const summary = `Calorias:${Math.round(t.calories)}/${g.calories}kcal Proteina:${Math.round(t.protein)}g Carbos:${Math.round(t.carbs)}g Grasas:${Math.round(t.fat)}g Fibra:${Math.round(t.fiber)}g Alimentos:${foods.map(f=>f.name).join(",")}`;
+    try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {method:"POST", headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"}, body:JSON.stringify({model:MODEL, max_tokens:500, system:ADVICE_PROMPT, messages:[{role:"user", content:summary}]})});
+        const data = await res.json();
+        const text = data.content?.[0]?.text?.trim().replace(/```json|```/gi,"").trim();
+        const match = text?.match(/\{[\s\S]*\}/);
+        if (!match) { btn.textContent = "Analizar mi dia"; btn.disabled = false; return; }
+        const a = JSON.parse(match[0]);
+        document.getElementById("adviceContent").innerHTML = `<div style="margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#ecf8e8;border:1px solid #cce8c4;margin-bottom:12px"><div style="font-size:32px">${a.emoji}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:22px;color:#3a7a3a;font-weight:700;font-family:Fraunces,serif">${a.score}</span><span style="font-size:11px;color:#7aaa7a">/10</span><div style="flex:1;height:6px;border-radius:99px;background:#d8eed4;margin-left:4px"><div style="height:100%;width:${a.score*10}%;border-radius:99px;background:${a.score>=7?"#52c478":a.score>=5?"#f0c050":"#f07a5a"}"></div></div></div><div style="font-size:12px;color:#3a5a3a;font-weight:500">${a.summary}</div></div></div><div style="padding:10px 14px;border-radius:14px;background:#f8fff6;border:1px solid #d8eed4;margin-bottom:8px"><div style="font-size:11px;color:#52a062;font-weight:700">💚 ${a.highlight}</div></div><div style="font-size:11px;color:#5a7a5a;font-weight:700;margin-bottom:6px">SUGERENCIAS</div>${a.tips.map((tip,i) => `<div style="display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:#3a5a3a;line-height:1.4"><span style="color:#7acd8a;font-weight:700;flex-shrink:0">${i+1}.</span>${tip}</div>`).join("")}</div>`;
+        btn.textContent = "Actualizar";
+    } catch(e) { btn.textContent = "Analizar mi dia"; }
+    btn.disabled = false;
+}
+function setObj(key) { currentObj = key; document.querySelectorAll(".obj-btn").forEach((b,i) => { b.className = "obj-btn" + (["bajar","mantener","subir"][i] === key ? " active" : ""); }); updateGoalsPreview(); }
+function updateGoalsPreview() {
+    const p = {weight:document.getElementById("pWeight").value, height:document.getElementById("pHeight").value, age:document.getElementById("pAge").value, sex:document.getElementById("pSex").value, activity:document.getElementById("pActivity").value, objective:currentObj};
+    const g = calcGoals(p);
+    document.getElementById("goalsPreview").innerHTML = [["Cal",g.calories,"#3a7a3a"],["Prot",g.protein,"#52c478"],["Carbs",g.carbs,"#f0c050"],["Grasas",g.fat,"#f07a5a"],["Fibra",g.fiber,"#78c0f0"]].map(([l,v,c]) => `<div class="goal-item"><div class="goal-val" style="color:${c}">${v}</div><div class="goal-lbl">${l}</div></div>`).join("");
+}
+function openProfile() {
+    if (profile.weight) document.getElementById("pWeight").value = profile.weight;
+    if (profile.height) document.getElementById("pHeight").value = profile.height;
+    if (profile.age) document.getElementById("pAge").value = profile.age;
+    if (profile.sex) document.getElementById("pSex").value = profile.sex;
+    if (profile.activity) document.getElementById("pActivity").value = profile.activity;
+    if (profile.objective) { currentObj = profile.objective; setObj(currentObj); }
+    updateGoalsPreview();
+    document.getElementById("profileModal").style.display = "flex";
+}
+function closeProfile() { document.getElementById("profileModal").style.display = "none"; }
+function saveProfile() {
+    profile = {weight:document.getElementById("pWeight").value, height:document.getElementById("pHeight").value, age:document.getElementById("pAge").value, sex:document.getElementById("pSex").value, activity:document.getElementById("pActivity").value, objective:currentObj};
+    saveLS("ct:profile", profile);
+    const btn = document.getElementById("profileBtn"); btn.style.background = "linear-gradient(135deg,#5fc96e,#3da050)"; btn.style.color = "white";
+    closeProfile(); render();
+}
+function openHistory() {
+    const days = Object.keys(history).sort((a,b) => b.localeCompare(a)).slice(0,14);
+    const g = getGoals(); let html = "";
+    if (!days.length) { html = `<div style="text-align:center;padding:40px 0"><div style="font-size:40px">📭</div><div style="font-size:16px;color:#90b080;margin-top:10px">Sin historial aun</div></div>`; }
+    else days.forEach(day => {
+        const af = Object.values(history[day]||{}).flat();
+        const tot = af.reduce((a,f) => ({calories:a.calories+f.calories, protein:a.protein+f.protein, carbs:a.carbs+f.carbs, fat:a.fat+f.fat}), {calories:0,protein:0,carbs:0,fat:0});
+        const pct = Math.min(tot.calories/g.calories*100, 100), isToday = day === todayKey();
+        const fmt = new Date(day+"T12:00:00").toLocaleDateString("es-AR", {weekday:"short", day:"numeric", month:"short"});
+        html += `<div class="history-day${isToday?" today":""}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span style="font-weight:700;color:#1e3a1e;font-size:13px">${isToday?"Hoy · ":""}${fmt}</span><span style="font-size:11px;color:#8aaa7a;margin-left:6px">${af.length} alimentos</span></div><span style="font-size:16px;font-weight:700;color:${tot.calories>g.calories?"#e8806a":"#3a7a3a"}">${Math.round(tot.calories)} kcal</span></div><div style="height:5px;border-radius:99px;background:#e4f0e0;margin-bottom:8px"><div style="height:100%;width:${pct}%;border-radius:99px;background:${tot.calories>g.calories?"#e8806a":"#52b86a"}"></div></div><div style="display:flex;flex-wrap:wrap;gap:4px">${af.slice(0,5).map(f=>`<span style="font-size:11px;background:white;border:1px solid #d8eed4;border-radius:99px;padding:2px 8px;color:#4a7a4a">${f.emoji} ${f.name}</span>`).join("")}${af.length>5?`<span style="font-size:11px;color:#9ab89a">+${af.length-5} mas</span>`:""}</div></div>`;
+    });
+    document.getElementById("historyList").innerHTML = html;
+    document.getElementById("historyModal").style.display = "flex";
+}
+function closeHistory() { document.getElementById("historyModal").style.display = "none"; }
 render();
 </script>
 </body>
