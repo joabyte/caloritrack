@@ -91,6 +91,13 @@
     </style>
 </head>
 <body>
+
+<!-- INPUTS OCULTOS FIJOS EN EL HTML - UNICA FORMA QUE FUNCIONA EN ANDROID -->
+<div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden">
+    <input type="file" id="inputCamara" accept="image/*" capture="environment"/>
+    <input type="file" id="inputGaleria" accept="image/*"/>
+</div>
+
 <div class="wrap">
     <div class="header">
         <div class="header-top">
@@ -255,22 +262,17 @@
 </div>
 
 <script>
-let API_KEY = "";
-fetch("/api/key").then(r => r.json()).then(d => { API_KEY = d.key; });
-const MODEL = "claude-sonnet-4-20250514";
-const SYSTEM_PROMPT = `Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
-const ADVICE_PROMPT = `Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
-const PHOTO_PROMPT = `Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
-const MEALS = [
-    {key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},
-    {key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},
-    {key:"merienda",label:"Merienda",emoji:"🍵",color:"#f0a050"},
-    {key:"cena",label:"Cena",emoji:"🌙",color:"#7890f0"}
-];
-const QUICK = ["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
-const ACTS = {sedentario:1.2,ligero:1.375,moderado:1.55,activo:1.725};
-const OBJS = {bajar:0.8,mantener:1.0,subir:1.2};
-let activeMeal="desayuno", activeMealFoto="almuerzo", currentObj="mantener";
+let API_KEY="";
+fetch("/api/key").then(r=>r.json()).then(d=>{API_KEY=d.key;});
+const MODEL="claude-sonnet-4-20250514";
+const SYSTEM_PROMPT=`Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
+const ADVICE_PROMPT=`Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
+const PHOTO_PROMPT=`Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
+const MEALS=[{key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},{key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},{key:"merienda",label:"Merienda",emoji:"🍵",color:"#f0a050"},{key:"cena",label:"Cena",emoji:"🌙",color:"#7890f0"}];
+const QUICK=["🍌 Banana","🥚 Huevo","🍗 Pollo","🥑 Palta","🥛 Leche","🍎 Manzana","🍚 Arroz","🥦 Brocoli"];
+const ACTS={sedentario:1.2,ligero:1.375,moderado:1.55,activo:1.725};
+const OBJS={bajar:0.8,mantener:1.0,subir:1.2};
+let activeMeal="desayuno",activeMealFoto="almuerzo",currentObj="mantener";
 let meals=loadLS("ct:meals:"+todayKey(),{desayuno:[],almuerzo:[],merienda:[],cena:[]});
 let profile=loadLS("ct:profile",{});
 let history=loadLS("ct:history",{});
@@ -279,39 +281,33 @@ let fotoItemsDetectados=[];
 function todayKey(){return new Date().toISOString().split("T")[0];}
 function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-function calcGoals(p){
-    const w=Number(p.weight)||70,h=Number(p.height)||170,a=Number(p.age)||25;
-    const bmr=p.sex==="F"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
-    const cal=Math.round(bmr*(ACTS[p.activity]||1.55)*(OBJS[p.objective]||1));
-    return{calories:cal,protein:Math.round(w*1.8),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:30};
-}
+function calcGoals(p){const w=Number(p.weight)||70,h=Number(p.height)||170,a=Number(p.age)||25;const bmr=p.sex==="F"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;const cal=Math.round(bmr*(ACTS[p.activity]||1.55)*(OBJS[p.objective]||1));return{calories:cal,protein:Math.round(w*1.8),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:30};}
 function getGoals(){return profile.weight?calcGoals(profile):{calories:2000,protein:150,carbs:250,fat:65,fiber:30};}
 function getAllFoods(){return Object.values(meals).flat();}
 function getTotals(){return getAllFoods().reduce((a,f)=>({calories:a.calories+f.calories,protein:a.protein+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat,fiber:a.fiber+f.fiber}),{calories:0,protein:0,carbs:0,fat:0,fiber:0});}
 function persistMeals(upd){meals=upd;const t=todayKey();history[t]=upd;saveLS("ct:meals:"+t,upd);saveLS("ct:history",history);render();}
 
+// SOLUCION DEFINITIVA PARA ANDROID
+// Los inputs estan fijos en el HTML pero se resetean cada vez con cloneNode
 function abrirCamara(){
-    const input=document.createElement("input");
-    input.type="file";
-    input.accept="image/*";
-    input.setAttribute("capture","environment");
-    input.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(()=>document.body.removeChild(input),60000);
+    const viejo=document.getElementById("inputCamara");
+    const nuevo=viejo.cloneNode(true);
+    nuevo.value="";
+    nuevo.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
+    viejo.parentNode.replaceChild(nuevo,viejo);
+    nuevo.click();
 }
 
 function abrirGaleria(){
-    const input=document.createElement("input");
-    input.type="file";
-    input.accept="image/*";
-    input.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(()=>document.body.removeChild(input),60000);
+    const viejo=document.getElementById("inputGaleria");
+    const nuevo=viejo.cloneNode(true);
+    nuevo.value="";
+    nuevo.onchange=(e)=>{if(e.target.files&&e.target.files[0])procesarImagen(e.target.files[0]);};
+    viejo.parentNode.replaceChild(nuevo,viejo);
+    nuevo.click();
 }
 
-function procesarImagen(file){
+async function procesarImagen(file){
     const preview=document.getElementById("fotoPreview");
     const reader=new FileReader();
     reader.onload=async(e)=>{
@@ -416,13 +412,7 @@ function renderWeek(){
 
 function setMeal(key){activeMeal=key;render();}
 function setMealFoto(key){activeMealFoto=key;render();}
-function setTab(tab){
-    ["hoy","foto","semana"].forEach(t=>{
-        document.getElementById("view-"+t).style.display=t===tab?"block":"none";
-        document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");
-    });
-    if(tab==="semana")renderWeek();
-}
+function setTab(tab){["hoy","foto","semana"].forEach(t=>{document.getElementById("view-"+t).style.display=t===tab?"block":"none";document.getElementById("tab-"+t).className="tab-btn"+(t===tab?" active":"");});if(tab==="semana")renderWeek();}
 function setError(msg){const box=document.getElementById("errorBox");if(msg){box.textContent=msg;box.style.display="block";}else box.style.display="none";}
 function quickSearch(s){const q=s.replace(/^\S+\s/,"");document.getElementById("searchInput").value=q;doSearch();}
 async function doSearch(){
