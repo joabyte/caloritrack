@@ -340,7 +340,20 @@ fetch("/api/key").then(r => r.json()).then(d => { API_KEY = d.key; });
 const MODEL = "claude-sonnet-4-20250514";
 const SYSTEM_PROMPT = `Eres nutricionista experto. El usuario describe un alimento. Responde SOLO con JSON sin markdown: {"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"porcion"} Si no reconoces: {"error":"No reconocido"}`;
 const ADVICE_PROMPT = `Eres nutricionista experto. Analiza el registro y responde SOLO JSON sin markdown: {"score":8,"emoji":"emoji","summary":"resumen 1 oracion","tips":["tip1","tip2","tip3"],"highlight":"algo positivo"}`;
-const PHOTO_PROMPT = `Eres nutricionista experto en vision de alimentos. Analiza esta imagen y detecta todos los alimentos visibles estimando porciones. Responde SOLO con JSON sin markdown: {"items":[{"name":"Nombre","emoji":"emoji","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion porcion"}],"description":"descripcion breve"} Se preciso estimando calorias por las porciones que ves visualmente.`;
+const PHOTO_PROMPT = `Eres un nutricionista experto con vision computacional avanzada especializado en cocina latinoamericana y argentina. Analiza esta imagen con maxima precision siguiendo estos pasos:
+
+1. IDENTIFICA cada alimento visible, incluyendo guarniciones, salsas y bebidas
+2. ESTIMA la porcion usando referencias visuales: tamano del plato (plato grande=28cm, chico=22cm), grosor, volumen
+3. CALCULA las calorias con precision para esa porcion especifica, no valores genericos
+4. Si ves un plato compuesto (milanesa con papas, guiso, pasta), desglosa CADA componente por separado
+5. Reconoce comidas tipicas: milanesa, asado, empanadas, locro, mate, facturas, medialunas, alfajores, pizza argentina, etc.
+6. Si hay bebidas, incluirlas (gaseosa, jugo, cerveza, vino, mate)
+7. Si algo esta poco visible, estima con precaucion y menciona en la porcion que es aproximado
+
+Responde SOLO con este JSON sin markdown ni explicaciones:
+{"items":[{"name":"Nombre especifico del alimento","emoji":"emoji relevante","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"portion":"descripcion detallada de la porcion vista"}],"description":"descripcion breve del plato completo"}
+
+IMPORTANTE: Se muy especifico. No pongas 'Pollo' si podes poner 'Pechuga de pollo grillada'. No pongas 200kcal si podes calcular 340kcal para esa porcion real.`;
 const MEALS = [
     {key:"desayuno",label:"Desayuno",emoji:"🌅",color:"#f0c050"},
     {key:"almuerzo",label:"Almuerzo",emoji:"☀️",color:"#52c478"},
